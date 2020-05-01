@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.core.app.ActivityCompat;
@@ -29,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 import htw_berlin.ba_timsitte.R;
-import htw_berlin.ba_timsitte.network.Device;
+import htw_berlin.ba_timsitte.network.Node;
 import htw_berlin.ba_timsitte.network.MapDeviceListAdapter;
 
 public class MapActivity extends AppCompatActivity {
@@ -40,7 +39,7 @@ public class MapActivity extends AppCompatActivity {
 
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
-    public ArrayList<Device> deviceList = new ArrayList<>();
+    public ArrayList<Node> nodeList = new ArrayList<>();
     private ArrayList<Marker> markerList = new ArrayList<>();
     private MapDeviceListAdapter mAdapter;
 
@@ -77,7 +76,7 @@ public class MapActivity extends AppCompatActivity {
         //
 
         createMocks();
-        mAdapter = new MapDeviceListAdapter(this, deviceList);
+        mAdapter = new MapDeviceListAdapter(this, nodeList);
         listViewDeviceList.setAdapter(mAdapter);
         initiateMarkers();
     }
@@ -130,7 +129,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     public void initiateMarkers(){
-        for (Device d: deviceList){
+        for (Node d: nodeList){
             Log.d(TAG, "Adding Marker " + d.getId());
             Marker mMarker = new Marker(map);
             GeoPoint gp = new GeoPoint(d.getGp().getLatitude(), d.getGp().getLongitude());
@@ -152,10 +151,10 @@ public class MapActivity extends AppCompatActivity {
 
     // ----------------- testing methods -----------------
     public void createMocks(){
-        Device a = new Device(1);
-        Device b = new Device(2);
-        Device c = new Device(3);
-        Device d = new Device(4);
+        Node a = new Node(1);
+        Node b = new Node(2);
+        Node c = new Node(3);
+        Node d = new Node(4);
         a.setIs_active(true);
         b.setIs_active(false);
         c.setIs_active(true);
@@ -168,9 +167,9 @@ public class MapActivity extends AppCompatActivity {
         b.setGp(b1);
         c.setGp(c1);
         d.setGp(d1);
-        deviceList.add(a);
-        deviceList.add(b);
-        deviceList.add(c);
-        deviceList.add(d);
+        nodeList.add(a);
+        nodeList.add(b);
+        nodeList.add(c);
+        nodeList.add(d);
     }
 }

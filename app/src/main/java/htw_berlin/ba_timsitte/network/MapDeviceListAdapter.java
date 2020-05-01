@@ -17,14 +17,14 @@ import java.util.List;
 
 import htw_berlin.ba_timsitte.R;
 
-public class MapDeviceListAdapter extends ArrayAdapter<Device> {
+public class MapDeviceListAdapter extends ArrayAdapter<Node> {
     private Context mContext;
-    private List<Device> deviceList = new ArrayList<>();
+    private List<Node> nodeList = new ArrayList<>();
 
-    public MapDeviceListAdapter(@NonNull Context context, @SuppressLint("SupportAnnotationUsage") @LayoutRes ArrayList<Device> list) {
+    public MapDeviceListAdapter(@NonNull Context context, @SuppressLint("SupportAnnotationUsage") @LayoutRes ArrayList<Node> list) {
         super(context, 0, list);
         mContext = context;
-        deviceList = list;
+        nodeList = list;
     }
     @NonNull
     @Override
@@ -33,20 +33,20 @@ public class MapDeviceListAdapter extends ArrayAdapter<Device> {
         if(listItem == null)
             listItem = LayoutInflater.from(mContext).inflate(R.layout.map_device_adapter_view, parent,false);
 
-        Device currentDevice = deviceList.get(position);
+        Node currentNode = nodeList.get(position);
 
 
         TextView id = (TextView) listItem.findViewById(R.id.map_deviceId);
-        id.setText(Integer.toString(currentDevice.getId()));
+        id.setText(Integer.toString(currentNode.getId()));
 
         TextView gpLati = (TextView) listItem.findViewById(R.id.map_deviceGeoPointLatitude);
-        gpLati.setText(Double.toString(currentDevice.getGp().getLatitude()));
+        gpLati.setText(Double.toString(currentNode.getGp().getLatitude()));
 
         TextView gpLong = (TextView) listItem.findViewById(R.id.map_deviceGeoPointLongitude);
-        gpLong.setText(Double.toString(currentDevice.getGp().getLongitude()));
+        gpLong.setText(Double.toString(currentNode.getGp().getLongitude()));
 
         TextView isActive = (TextView) listItem.findViewById(R.id.map_deviceIsActive);
-        if (currentDevice.isIs_active()){
+        if (currentNode.isIs_active()){
             isActive.setText("Status: Aktiv");
         } else {
             isActive.setText("Status: Inaktiv");

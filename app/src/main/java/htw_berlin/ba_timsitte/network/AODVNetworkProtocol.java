@@ -3,16 +3,16 @@ package htw_berlin.ba_timsitte.network;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class NetworkProtocol {
-    private static final NetworkProtocol instance = new NetworkProtocol();
-    // private ArrayList<RoutingEntry> routingTable = new ArrayList<>();
-    private ArrayList<Device> deviceList = new ArrayList<>();
+public class AODVNetworkProtocol {
+    private static final AODVNetworkProtocol instance = new AODVNetworkProtocol();
+    private ArrayList<RouteEntry> routingTable = new ArrayList<>();
+    private ArrayList<Node> nodeList = new ArrayList<>();
     private AtomicInteger id;
 
     /**
      * Singleton constructor
      */
-    private NetworkProtocol(){
+    private AODVNetworkProtocol(){
 
     }
 
@@ -20,7 +20,7 @@ public class NetworkProtocol {
      *
      * @return
      */
-    public static NetworkProtocol getInstance(){
+    public static AODVNetworkProtocol getInstance(){
         return instance;
     }
 
@@ -63,8 +63,8 @@ public class NetworkProtocol {
             // Message pop up that no more Devices can be added
         }
         int newId = id.incrementAndGet();
-        Device device = new Device(newId);
+        Node node = new Node(newId);
 
-        deviceList.add(device);
+        nodeList.add(node);
     }
 }

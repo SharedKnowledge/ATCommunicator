@@ -8,7 +8,7 @@ import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 
-public class Device {
+public class Node {
 
     private int id;
     private boolean is_active = true;
@@ -31,7 +31,7 @@ public class Device {
      *
      * @param id
      */
-    public Device(int id){
+    public Node(int id){
         this.id = id;
         this.is_active = true;
         // 10 minutes time to live
