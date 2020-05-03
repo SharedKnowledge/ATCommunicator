@@ -14,7 +14,7 @@ public class Node {
     private boolean is_active = true;
     private GeoPoint gp = new GeoPoint(1.0,2.0);
     // list of known neighbours
-    private ArrayList neighbourList= new ArrayList();
+    // private ArrayList neighbourList= new ArrayList();
 
     private CountDownTimer timeToLive  = new CountDownTimer(600000, 200000) {
         @Override
@@ -71,11 +71,4 @@ public class Node {
         this.gp = gp;
     }
 
-    public ArrayList getNeighbourList() {
-        return neighbourList;
-    }
-
-    public void setNeighbourList(ArrayList neighbourList) {
-        this.neighbourList = neighbourList;
-    }
 }

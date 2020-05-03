@@ -246,7 +246,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
 
     @OnClick(R.id.btnMap)
     public void changeToMap(View view){
-        Intent intent = new Intent(this, MapActivity.class);
+        Intent intent = new Intent(this, CommandActivity.class);
         startActivity(intent);
     }
 

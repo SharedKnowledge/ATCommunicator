@@ -57,10 +57,10 @@ public class AODVNetworkProtocol {
     /**
      *
      */
-    private void addNewDevice(String name){
+    private void addNewNode(String name){
         // checking for overflow
         if (id.get() == Integer.MAX_VALUE){
-            // Message pop up that no more Devices can be added
+            // Message pop up that no more Nodes can be added
         }
         int newId = id.incrementAndGet();
         Node node = new Node(newId);

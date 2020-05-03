@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".activities.BluetoothActivity">
 
     <Button
@@ -60,7 +61,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="10dp"
-        android:text="Button"
+        android:text="Command Activity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnDiscover"
         app:layout_constraintTop_toTopOf="parent" />

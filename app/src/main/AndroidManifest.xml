@@ -15,12 +15,13 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_foreground"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MapActivity"></activity>
+        <activity android:name=".activities.SettingsActivity"/>
+        <activity android:name=".activities.CommandActivity" />
+        <activity android:name=".activities.MapActivity" />
         <activity android:name=".activities.BluetoothActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
