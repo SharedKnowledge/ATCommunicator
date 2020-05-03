@@ -22,6 +22,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import org.osmdroid.views.MapView;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -34,7 +36,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
     @BindView(R.id.btnDiscoverability) Button mbtnDiscoverability;
     @BindView(R.id.btnDiscover) Button mbtnDiscover;
     @BindView(R.id.lvDevices) ListView mlvDevices;
-    @BindView(R.id.btnMap) Button mbtnMap;
+    @BindView(R.id.btnCommand) Button mbtnCommand;
 
 
     private static final String TAG = "BluetoothActivity";
@@ -150,7 +152,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bluetooth);
+        setContentView(R.layout.activity_bluetooth);
         ButterKnife.bind(this);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -244,7 +246,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
         }
     }
 
-    @OnClick(R.id.btnMap)
+    @OnClick(R.id.btnCommand)
     public void changeToMap(View view){
         Intent intent = new Intent(this, CommandActivity.class);
         startActivity(intent);

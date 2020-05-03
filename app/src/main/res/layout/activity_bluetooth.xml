@@ -37,7 +37,7 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="14dp"
         android:text="Discover"
-        app:layout_constraintEnd_toStartOf="@+id/btnMap"
+        app:layout_constraintEnd_toStartOf="@+id/btnCommand"
         app:layout_constraintStart_toEndOf="@+id/btnDiscoverability"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -55,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btnOnOff" />
 
     <Button
-        android:id="@+id/btnMap"
+        android:id="@+id/btnCommand"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"

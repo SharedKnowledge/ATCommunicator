@@ -9,4 +9,332 @@
 
     <include
         layout="@layout/app_toolbar"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp"/>
+
+    <!---RF Frequency-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_3"
+            android:gravity="center_vertical"
+            android:text="RF Frequency"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="@integer/weight_column_2_of_3"
+            android:text=""
+            android:id="@+id/settings_rffrequency"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="@integer/weight_column_3_of_3"
+            android:text="MHz"/>
+    </LinearLayout>
+
+    <!---Power-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_3"
+            android:gravity="center_vertical"
+            android:text="Power"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_2_of_3"
+            android:gravity="center_vertical"
+            android:text=""
+            android:id="@+id/settings_power"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="@integer/weight_column_3_of_3"
+            android:text="dBm"/>
+    </LinearLayout>
+
+    <!---Signal Bandwidth-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            android:gravity="center_vertical"
+            android:text="Signal Bandwidth"/>
+        <Spinner
+            android:id="@+id/settings_bandwidth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contextClickable="true"
+            android:textAlignment="textEnd"
+            android:textSize="20sp"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            />
+    </LinearLayout>
+
+    <!---Spreading Factor-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            android:gravity="center_vertical"
+            android:text="Spreading Factor"/>
+        <Spinner
+            android:id="@+id/settings_spreadingfactor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contextClickable="true"
+            android:textAlignment="textEnd"
+            android:textSize="20sp"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            />
+    </LinearLayout>
+
+    <!---Error Coding-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            android:gravity="center_vertical"
+            android:text="Error Coding"/>
+        <Spinner
+            android:id="@+id/settings_error"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contextClickable="true"
+            android:textAlignment="textEnd"
+            android:textSize="20sp"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            />
+    </LinearLayout>
+
+    <!---CRC-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            android:gravity="center_vertical"
+            android:text="CRC"/>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/settings_crc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contextClickable="true"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            />
+    </LinearLayout>
+
+    <!---Implicit Header On-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            android:gravity="center_vertical"
+            android:text="Implicit Header On"/>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/settings_implicitheader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contextClickable="true"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            />
+    </LinearLayout>
+
+    <!---Rx Single on-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            android:gravity="center_vertical"
+            android:text="Rx Single on"/>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/settings_rxsingle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contextClickable="true"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            />
+    </LinearLayout>
+
+    <!---Frequency Hop on-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            android:gravity="center_vertical"
+            android:text="Rx Single on"/>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/settings_frequencyhop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contextClickable="true"
+            android:layout_weight="@integer/weight_column_1_of_2"
+            />
+    </LinearLayout>
+
+    <!---Hop Period-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_3"
+            android:gravity="center_vertical"
+            android:text="Hop Period"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_2_of_3"
+            android:gravity="center_vertical"
+            android:id="@+id/settings_hopperiod"
+            android:text="" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="@integer/weight_column_3_of_3"
+            android:text="ms"/>
+    </LinearLayout>
+
+    <!---Payload Length-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_3"
+            android:gravity="center_vertical"
+            android:text="Payload Length"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_2_of_3"
+            android:gravity="center_vertical"
+            android:id="@+id/settings_payloadlength"
+            android:text="" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="@integer/weight_column_3_of_3"
+            android:text=""/>
+    </LinearLayout>
+
+    <!---Preamble Length-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_1_of_3"
+            android:gravity="center_vertical"
+            android:text="Preamble Length"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="@integer/weight_column_2_of_3"
+            android:gravity="center_vertical"
+            android:id="@+id/settings_preamblelength"
+            android:text="" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="@integer/weight_column_3_of_3"
+            android:text=""/>
+    </LinearLayout>
+
 </LinearLayout>

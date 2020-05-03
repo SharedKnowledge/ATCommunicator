@@ -28,7 +28,10 @@ public class CommandActivity extends AppCompatActivity {
     // ----------------- Toolbar methods -----------------
     public void initiateSupportActionBar(){
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Commander");
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setTitle("Commander");
+        }
+
     }
 
     @Override
@@ -52,8 +55,7 @@ public class CommandActivity extends AppCompatActivity {
                 return true;
 
             default:
-                super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="weight_column_1_of_3">10</integer>
+    <integer name="weight_column_2_of_3">10</integer>
+    <integer name="weight_column_3_of_3">2</integer>
+    <integer name="weight_column_1_of_2">11</integer>
+    <integer name="weight_column_2_of_2">11</integer>
+</resources>

@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -43,7 +41,7 @@ public class MapActivity extends AppCompatActivity {
 
     @BindView(R.id.lvDeviceList) ListView listViewDeviceList;
     @BindView(R.id.app_toolbar) Toolbar mToolbar;
-    @BindView(R.id.btnMap) MapView map = null;
+    @BindView(R.id.btnCommand) MapView map = null;
 
     private static final String TAG = "MapActivity";
 
@@ -83,9 +81,9 @@ public class MapActivity extends AppCompatActivity {
     // ----------------- Toolbar methods -----------------
     public void initiateSupportActionBar(){
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Map");
         // add back arrow to toolbar
         if (getSupportActionBar() != null){
+            getSupportActionBar().setTitle("Map");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }

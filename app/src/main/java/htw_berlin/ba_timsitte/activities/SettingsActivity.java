@@ -31,10 +31,11 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         // add back arrow to toolbar
         if (getSupportActionBar() != null){
+            getSupportActionBar().setTitle("Settings");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
-        getSupportActionBar().setTitle("Settings");
+
     }
 
     @Override
