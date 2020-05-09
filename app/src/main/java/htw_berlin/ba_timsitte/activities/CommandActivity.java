@@ -9,12 +9,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import org.osmdroid.util.GeoPoint;
+
+import java.util.concurrent.ThreadLocalRandom;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import htw_berlin.ba_timsitte.R;
+import htw_berlin.ba_timsitte.network.AODVNetworkProtocol;
+import htw_berlin.ba_timsitte.network.Node;
 
 public class CommandActivity extends AppCompatActivity {
     @BindView(R.id.app_toolbar) Toolbar mToolbar;
+
+    AODVNetworkProtocol protocol = AODVNetworkProtocol.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +55,7 @@ public class CommandActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.menu_btnmap:
                 Intent intent = new Intent(this, MapActivity.class);
+                intent.putParcelableArrayListExtra("nodeList", protocol.getNodeList());
                 startActivity(intent);
                 return true;
 
@@ -57,5 +67,25 @@ public class CommandActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    // ----------------- OnClick methods -----------------
+
+    @OnClick(R.id.btnSend)
+    public void sendCommand(){
+        // test add node
+        addRandomNode();
+    }
+
+    public void addRandomNode(){
+        double lat_min = 52.564000;
+        double lat_max = 52.569000;
+        double lon_min = 13.404000;
+        double lon_max = 13.409000;
+        double lat_random = ThreadLocalRandom.current().nextDouble(lat_min, lat_max);
+        double lon_random = ThreadLocalRandom.current().nextDouble(lon_min, lon_max);
+        String name = "test";
+
+        protocol.addNewNode(name, lat_random, lon_random);
     }
 }

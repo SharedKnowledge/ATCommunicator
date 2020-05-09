@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -65,11 +66,13 @@ public class MapActivity extends AppCompatActivity {
         initiateSupportActionBar();
         initiateMapView();
 
-        createMocks();
+        Intent intent = getIntent();
+        nodeList = intent.getParcelableArrayListExtra("nodeList");
+
         mAdapter = new MapDeviceListAdapter(this, nodeList);
         listViewDeviceList.setAdapter(mAdapter);
         initiateMarkers();
-        initiateLines();
+        //initiateLines();
     }
 
     @Override
@@ -158,6 +161,10 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Enable/disable marker of node on map
+     * @param position
+     */
     @OnItemClick(R.id.lvDeviceList)
     public void onItemShowMarker(int position){
         if (markerList.get(position).isEnabled()){
@@ -183,7 +190,7 @@ public class MapActivity extends AppCompatActivity {
             );
             mMarker.setTextLabelFontSize(80);
             mMarker.setTextIcon(Integer.toString(d.getId()));
-            markerList.add(d.getId()-1, mMarker);
+            markerList.add(mMarker);
             map.getOverlays().add(mMarker);
         }
     }
@@ -200,39 +207,4 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-
-    // ----------------- testing methods -----------------
-    public void createMocks(){
-        Node a = new Node(1);
-        Node b = new Node(2);
-        Node c = new Node(3);
-        Node d = new Node(4);
-        a.setIs_active(true);
-        b.setIs_active(false);
-        c.setIs_active(true);
-        d.setIs_active(true);
-        GeoPoint a1 = new GeoPoint(52.567719, 13.407234);
-        GeoPoint b1 = new GeoPoint(52.567938, 13.409229);
-        GeoPoint c1 = new GeoPoint(52.568248, 13.411879);
-        GeoPoint d1 = new GeoPoint(52.566875, 13.410434);
-        a.setGp(a1);
-        b.setGp(b1);
-        c.setGp(c1);
-        d.setGp(d1);
-        nodeList.add(a);
-        nodeList.add(b);
-        nodeList.add(c);
-        nodeList.add(d);
-
-        RouteEntry re1 = new RouteEntry(1, a, b, 1);
-        RouteEntry re2 = new RouteEntry(1, b, c, 1);
-        RouteEntry re3 = new RouteEntry(1, a, d, 2);
-        RouteEntry re4 = new RouteEntry(1, c, d, 2);
-
-        routingTable.add(re1);
-        routingTable.add(re2);
-        routingTable.add(re3);
-        routingTable.add(re4);
-
-    }
 }

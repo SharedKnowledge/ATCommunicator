@@ -1,20 +1,23 @@
 package htw_berlin.ba_timsitte.network;
 
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.RequiresApi;
 
 import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 
-public class Node {
+public class Node implements Parcelable{
 
     private int id;
+    private String name;
     private boolean is_active = true;
-    private GeoPoint gp = new GeoPoint(1.0,2.0);
-    // list of known neighbours
-    // private ArrayList neighbourList= new ArrayList();
+    private GeoPoint gp;
+
 
     private CountDownTimer timeToLive  = new CountDownTimer(600000, 200000) {
         @Override
@@ -28,13 +31,28 @@ public class Node {
     };
 
     /**
-     *
+     * test constructor
      * @param id
      */
     public Node(int id){
         this.id = id;
+        this.name = "default";
         this.is_active = true;
         // 10 minutes time to live
+        timeToLive.start();
+    }
+
+    /**
+     *
+     * @param id
+     * @param lat
+     * @param lon
+     */
+    public Node(int id, String name, double lat, double lon){
+        this.id = id;
+        this.name = name;
+        this.gp = new GeoPoint(lat, lon);
+        this.is_active = true;
         timeToLive.start();
     }
 
@@ -69,6 +87,43 @@ public class Node {
 
     public void setGp(GeoPoint gp) {
         this.gp = gp;
+    }
+
+    // ----------------- make Node object parcelable -----------------
+
+    protected Node(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        is_active = in.readInt() == 1;
+        double lat = in.readDouble();
+        double lon = in.readDouble();
+        gp = new GeoPoint(lat, lon);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeInt(is_active ? 1 : 0);
+        dest.writeDouble(gp.getLatitude());
+        dest.writeDouble(gp.getLongitude());
+    }
+
+    public static final Creator<Node> CREATOR = new Creator<Node>() {
+        @Override
+        public Node createFromParcel(Parcel in) {
+            return new Node(in);
+        }
+
+        @Override
+        public Node[] newArray(int size) {
+            return new Node[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
 }
