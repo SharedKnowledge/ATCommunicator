@@ -9,8 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import org.osmdroid.util.GeoPoint;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 import butterknife.BindView;
@@ -18,7 +16,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import htw_berlin.ba_timsitte.R;
 import htw_berlin.ba_timsitte.network.AODVNetworkProtocol;
-import htw_berlin.ba_timsitte.network.Node;
 
 public class CommandActivity extends AppCompatActivity {
     @BindView(R.id.app_toolbar) Toolbar mToolbar;

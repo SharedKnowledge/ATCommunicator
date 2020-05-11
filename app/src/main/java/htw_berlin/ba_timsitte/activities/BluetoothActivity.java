@@ -2,6 +2,7 @@ package htw_berlin.ba_timsitte.activities;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import htw_berlin.ba_timsitte.R;
 import htw_berlin.ba_timsitte.communication.BluetoothDeviceListAdapter;
@@ -17,18 +18,24 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import htw_berlin.ba_timsitte.communication.BluetoothService;
 
 public class BluetoothActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -36,7 +43,8 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
     @BindView(R.id.btnDiscoverability) Button mbtnDiscoverability;
     @BindView(R.id.btnDiscover) Button mbtnDiscover;
     @BindView(R.id.lvDevices) ListView mlvDevices;
-    @BindView(R.id.btnCommand) Button mbtnCommand;
+    @BindView(R.id.app_toolbar) Toolbar mToolbar;
+    @BindView(R.id.btnStartService) Button mbtnStartService;
 
 
     private static final String TAG = "BluetoothActivity";
@@ -155,6 +163,8 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
         setContentView(R.layout.activity_bluetooth);
         ButterKnife.bind(this);
 
+        initiateSupportActionBar();
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         mlvDevices.setOnItemClickListener(BluetoothActivity.this);
@@ -181,6 +191,34 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
         unregisterReceiver(mBroadcastReceiver2);
         unregisterReceiver(mBroadcastReceiver3);
         unregisterReceiver(mBroadcastReceiver4);
+    }
+
+    // ----------------- Toolbar methods -----------------
+    public void initiateSupportActionBar(){
+        setSupportActionBar(mToolbar);
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setTitle("Bluetooth Connection");
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_bluetooth, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.menu_btncommand:
+                Intent intent = new Intent(this, CommandActivity.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     // ----------------- OnClick methods -----------------
@@ -246,10 +284,22 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
         }
     }
 
-    @OnClick(R.id.btnCommand)
-    public void changeToMap(View view){
-        Intent intent = new Intent(this, CommandActivity.class);
-        startActivity(intent);
+    /**
+     * this method should work automatically later on (after click)
+     */
+    @OnClick(R.id.btnStartService)
+    public void startingServiceWithBluetoothDevice(){
+        // Service start
+        String deviceAddress = null;
+        if (mBluetoothAdapter != null){
+            Intent intent = new Intent(this, BluetoothService.class);
+            // get bonded device - dunno what we will send to our service yet
+            intent.putExtra(deviceAddress, "btdevice");
+            startService(intent);
+        } else {
+            Toast.makeText(this, "Please bond your bluetooth connection first.", Toast.LENGTH_SHORT);
+        }
+
     }
 
     // ----------------- additional methods -----------------
