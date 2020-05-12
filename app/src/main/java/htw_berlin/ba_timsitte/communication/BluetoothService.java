@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.bluetooth.BluetoothClass.Device;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
@@ -39,9 +40,9 @@ public class BluetoothService extends Service {
     private AcceptThread mAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    public static BluetoothDevice device = null;
     private int mState;
     private int mNewState;
+    public static BluetoothDevice device = null;
 
     // ----------------- Service stuff -----------------
 
@@ -73,29 +74,36 @@ public class BluetoothService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "At onStartCommand.");
+        Log.d("BTConn", "Onstart Command");
         mAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mAdapter!= null){
-            device = mAdapter.getRemoteDevice((String) intent.getSerializableExtra(BT_DEVICE));
-            if (device != null){
+        if (mAdapter != null) {
+            //device = (BluetoothDevice) intent.getExtras();
+            //device = intent.getExtras().getParcelable("btdevice");
+            device = intent.getParcelableExtra("btdevice");
+            String macAddress = device.getAddress();
+            if (macAddress != null && macAddress.length() > 0) {
                 connect(device);
             } else {
-
+                stopSelf();
+                // return 0;
+                return START_NOT_STICKY;
             }
-
+        }
+        String stopservice = intent.getStringExtra("stopservice");
+        if (stopservice != null && stopservice.length() > 0) {
+            stop();
         }
         return START_STICKY;
-
     }
 
 
     // ----------------- BluetoothService stuff -----------------
 
     public BluetoothService(){
-        super();
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mNewState = mState;
+        mHandler = ((MyApplication) getApplication()).getHandler();
     }
 
     /**
@@ -132,7 +140,7 @@ public class BluetoothService extends Service {
     }
 
     /**
-     * Start the chat service. Specifically start AcceptThread to begin a
+     * Start the service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {

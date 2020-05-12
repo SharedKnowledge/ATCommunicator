@@ -52,6 +52,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
     BluetoothAdapter mBluetoothAdapter;
     public ArrayList<BluetoothDevice> mBluetoothDevices = new ArrayList<>();
     public BluetoothDeviceListAdapter mBluetoothDeviceListAdapter;
+    public ArrayList<BluetoothDevice> mPairedBluetoothDevices = new ArrayList<>();
 
 
     /**
@@ -290,11 +291,10 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
     @OnClick(R.id.btnStartService)
     public void startingServiceWithBluetoothDevice(){
         // Service start
-        String deviceAddress = null;
         if (mBluetoothAdapter != null){
             Intent intent = new Intent(this, BluetoothService.class);
-            // get bonded device - dunno what we will send to our service yet
-            intent.putExtra(deviceAddress, "btdevice");
+            BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            intent.putExtra("btdevice", mDevice);
             startService(intent);
         } else {
             Toast.makeText(this, "Please bond your bluetooth connection first.", Toast.LENGTH_SHORT);

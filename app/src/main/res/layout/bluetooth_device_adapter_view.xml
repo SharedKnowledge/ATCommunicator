@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="40dp"
+    android:orientation="horizontal">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvDeviceName"
-        android:textSize="15sp"
-        android:textColor="@color/colorText"/>
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:id="@+id/tvOnOff"
+        android:layout_marginRight="5dp"/>
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvDeviceAddress"
-        android:textSize="15sp"
-        android:textColor="@color/colorText"/>
+        android:layout_height="40dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvDeviceName"
+            android:textSize="15sp"
+            android:textColor="@color/colorText"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvDeviceAddress"
+            android:textSize="15sp"
+            android:textColor="@color/colorText"/>
+    </LinearLayout>
 </LinearLayout>
