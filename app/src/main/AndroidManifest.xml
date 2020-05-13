@@ -27,10 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.CommandActivity" />
-        <activity android:name=".activities.SettingsActivity" />
-        <activity android:name=".activities.MapActivity" />
-        <activity android:name=".activities.BluetoothActivity"/>
 
         <service android:name=".communication.BluetoothService" />
     </application>
