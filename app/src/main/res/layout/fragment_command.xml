@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
+    tools:context="htw_berlin.ba_timsitte.activities.CommandFragment">
+
+    <LinearLayout
+        android:id="@+id/layoutSecondToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Event History"
+            android:textColor="@color/colorText"
+            android:layout_weight="5"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Connected to ..."
+            android:textColor="@color/colorText"
+            android:layout_weight="5"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutTerminal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/layoutSecondToolbar"
+        android:layout_above="@+id/layoutFunctionToolbar">
+        <TextView
+            android:id="@+id/terminalView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/colorText"
+            android:maxLines="20"
+            android:lines="20">
+        </TextView>
+    </LinearLayout>
+
+    <TextView
+        android:background="@drawable/border_set"
+        android:layout_below="@+id/layoutTerminal"
+        android:layout_above="@+id/layoutFunctionToolbar"
+        android:layout_height="2dp"
+        android:layout_width="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/layoutFunctionToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <EditText
+            android:id="@+id/sendCommand"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/colorText"
+            android:layout_weight="5"/>
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="Send" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,12 +1,5 @@
 package htw_berlin.ba_timsitte.activities;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import htw_berlin.ba_timsitte.R;
-import htw_berlin.ba_timsitte.communication.BluetoothDeviceListAdapter;
-
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -17,11 +10,18 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -32,24 +32,62 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import htw_berlin.ba_timsitte.R;
+import htw_berlin.ba_timsitte.communication.BluetoothDeviceListAdapter;
 import htw_berlin.ba_timsitte.communication.BluetoothService;
 
-public class BluetoothActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class BluetoothFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-    @BindView(R.id.btnOnOff) Button mbtnOnOff;
+    @BindView(R.id.btnOnOff)
+    Button mbtnOnOff;
     @BindView(R.id.btnDiscoverability) Button mbtnDiscoverability;
     @BindView(R.id.btnDiscover) Button mbtnDiscover;
-    @BindView(R.id.lvDevices) ListView mlvDevices;
-    @BindView(R.id.app_toolbar) Toolbar mToolbar;
+    @BindView(R.id.lvDevices)
+    ListView mlvDevices;
     @BindView(R.id.btnStartService) Button mbtnStartService;
 
-
-    private static final String TAG = "BluetoothActivity";
+    private static final String TAG = "BluetoothFragment";
 
     BluetoothAdapter mBluetoothAdapter;
     public ArrayList<BluetoothDevice> mBluetoothDevices = new ArrayList<>();
     public BluetoothDeviceListAdapter mBluetoothDeviceListAdapter;
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_bluetooth, container, false);
+        ButterKnife.bind(this, view);
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        mlvDevices.setOnItemClickListener(BluetoothFragment.this);
+
+        IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        getActivity().registerReceiver(mBroadcastReceiver4, intentFilter);
+
+        //set everything up in regards to bluetooth situation
+        if (mBluetoothAdapter == null){
+            statusDisabled();
+        }
+        if (mBluetoothAdapter.isEnabled()){
+            statusOn();
+        }
+        if (!mBluetoothAdapter.isEnabled()){
+            statusOff();
+        }
+        return view;
+    }
+
+    public void onDestroy(){
+        Log.d(TAG, "onDestroy: called.");
+        super.onDestroy();
+        getActivity().unregisterReceiver(mBroadcastReceiver1);
+        getActivity().unregisterReceiver(mBroadcastReceiver2);
+        getActivity().unregisterReceiver(mBroadcastReceiver3);
+        getActivity().unregisterReceiver(mBroadcastReceiver4);
+    }
 
     /**
      * Broadcast receiver for changes made to bluetooth states
@@ -154,70 +192,6 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
         }
     };
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bluetooth);
-        ButterKnife.bind(this);
-
-        initiateSupportActionBar();
-
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        mlvDevices.setOnItemClickListener(BluetoothActivity.this);
-
-        IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(mBroadcastReceiver4, intentFilter);
-
-        //set everything up in regards to bluetooth situation
-        if (mBluetoothAdapter == null){
-            statusDisabled();
-        }
-        if (mBluetoothAdapter.isEnabled()){
-            statusOn();
-        }
-        if (!mBluetoothAdapter.isEnabled()){
-            statusOff();
-        }
-    }
-
-    public void onDestroy(){
-        Log.d(TAG, "onDestroy: called.");
-        super.onDestroy();
-        unregisterReceiver(mBroadcastReceiver1);
-        unregisterReceiver(mBroadcastReceiver2);
-        unregisterReceiver(mBroadcastReceiver3);
-        unregisterReceiver(mBroadcastReceiver4);
-    }
-
-    // ----------------- Toolbar methods -----------------
-    public void initiateSupportActionBar(){
-        setSupportActionBar(mToolbar);
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setTitle("Bluetooth Connection");
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_bluetooth, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
-            case R.id.menu_btncommand:
-                Intent intent = new Intent(this, CommandActivity.class);
-                startActivity(intent);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     // ----------------- OnClick methods -----------------
 
     @OnClick(R.id.btnOnOff)
@@ -231,7 +205,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
             startActivity(enableIntent);
 
             IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-            registerReceiver(mBroadcastReceiver1, BTIntent);
+            getActivity().registerReceiver(mBroadcastReceiver1, BTIntent);
 
             statusOn();
         }
@@ -239,7 +213,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
             mBluetoothAdapter.disable();
 
             IntentFilter BTIntent = new IntentFilter((BluetoothAdapter.ACTION_STATE_CHANGED));
-            registerReceiver(mBroadcastReceiver1, BTIntent);
+            getActivity().registerReceiver(mBroadcastReceiver1, BTIntent);
 
             statusOff();
         }
@@ -254,7 +228,7 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
         startActivity(discoverableIntent);
 
         IntentFilter intentFilter = new IntentFilter((mBluetoothAdapter.ACTION_SCAN_MODE_CHANGED));
-        registerReceiver(mBroadcastReceiver2, intentFilter);
+        getActivity().registerReceiver(mBroadcastReceiver2, intentFilter);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -270,14 +244,14 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
 
             mBluetoothAdapter.startDiscovery();
             IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mBroadcastReceiver3, discoveryDevicesIntent);
+            getActivity().registerReceiver(mBroadcastReceiver3, discoveryDevicesIntent);
         }
 
         if (!mBluetoothAdapter.isDiscovering()){
             checkBTPermission();
             mBluetoothAdapter.startDiscovery();
             IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mBroadcastReceiver3, discoveryDevicesIntent);
+            getActivity().registerReceiver(mBroadcastReceiver3, discoveryDevicesIntent);
         }
     }
 
@@ -288,12 +262,12 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
     public void startingServiceWithBluetoothDevice(){
         // Service start
         if (mBluetoothAdapter != null){
-            Intent intent = new Intent(this, BluetoothService.class);
+            Intent intent = new Intent(getActivity(), BluetoothService.class);
             BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             intent.putExtra("btdevice", mDevice);
-            startService(intent);
+            getActivity().startService(intent);
         } else {
-            Toast.makeText(this, "Please bond your bluetooth connection first.", Toast.LENGTH_SHORT);
+            Toast.makeText(getActivity(), "Please bond your bluetooth connection first.", Toast.LENGTH_SHORT);
         }
 
     }
@@ -329,8 +303,8 @@ public class BluetoothActivity extends AppCompatActivity implements AdapterView.
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkBTPermission(){
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-            int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCES_FINE_LOCATION");
-            permissionCheck += this.checkSelfPermission("Manifest.permission.ACCES_COARSE_LOCATION");
+            int permissionCheck = getActivity().checkSelfPermission("Manifest.permission.ACCES_FINE_LOCATION");
+            permissionCheck += getActivity().checkSelfPermission("Manifest.permission.ACCES_COARSE_LOCATION");
             if (permissionCheck != 0){
                 this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
             } else {
