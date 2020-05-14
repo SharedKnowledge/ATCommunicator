@@ -1,5 +1,6 @@
 package htw_berlin.ba_timsitte.communication;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -44,13 +45,14 @@ public class BluetoothService extends Service {
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
     // Member fields
     private BluetoothAdapter mAdapter;
-    private Handler mHandler;
+    private static Handler mHandler = null;
     private AcceptThread mAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
     private int mNewState;
     public static BluetoothDevice device = null;
+
 
     // ----------------- Service stuff -----------------
 
@@ -71,9 +73,9 @@ public class BluetoothService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        //mHandler = ((MyApplication) getApplication()).getHandler();
-        //return mBinder;
-        return null;
+        mHandler = ((MyApplication) getApplication()).getHandler();
+        return mBinder;
+        //return null;
     }
 
     public class LocalBinder extends Binder {
@@ -82,39 +84,38 @@ public class BluetoothService extends Service {
         }
     }
 
+    private final IBinder mBinder = new LocalBinder();
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        Log.d("BTConn", "Onstart Command");
-//        mAdapter = BluetoothAdapter.getDefaultAdapter();
-//        if (mAdapter != null) {
-//            //device = (BluetoothDevice) intent.getExtras();
-//            //device = intent.getExtras().getParcelable("btdevice");
-//            device = intent.getParcelableExtra("btdevice");
-//            String macAddress = device.getAddress();
-//            if (macAddress != null && macAddress.length() > 0) {
-//                connect(device);
-//            } else {
-//                stopSelf();
-//                // return 0;
-//                return START_NOT_STICKY;
-//            }
-//        }
-//        String stopservice = intent.getStringExtra("stopservice");
-//        if (stopservice != null && stopservice.length() > 0) {
-//            stop();
-//        }
-//        return START_STICKY;
-        String input = intent.getStringExtra("inputExtra");
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        Log.d("BTConn", "Onstart Command");
+        mAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mAdapter != null) {
+            device = intent.getExtras().getParcelable("btdevice");
+            device = intent.getParcelableExtra("btdevice");
+            String macAddress = device.getAddress();
+            if (macAddress != null && macAddress.length() > 0) {
+                // connect(device);
+            } else {
+                stopSelf();
+                return START_NOT_STICKY;
+            }
+        }
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Bluetooth Service")
-                .setContentText(input)
+                .setContentTitle("AT Communications")
+                .setContentText("Connected with " + device.getName() + ": " + device.getAddress())
                 .setSmallIcon(R.drawable.ic_applauncher)
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
+
+        String stopservice = intent.getStringExtra("stopservice");
+        if (stopservice != null && stopservice.length() > 0) {
+            stop();
+        }
 
         return START_NOT_STICKY; // START_REDELIVER_INTENT probably makes even more sense
     }
@@ -122,12 +123,6 @@ public class BluetoothService extends Service {
 
     // ----------------- BluetoothService stuff -----------------
 
-    public BluetoothService(){
-//        mAdapter = BluetoothAdapter.getDefaultAdapter();
-//        mState = STATE_NONE;
-//        mNewState = mState;
-//        mHandler = ((MyApplication) getApplication()).getHandler();
-    }
 
     /**
      * Constructor. Prepares a new BluetoothService session.
@@ -135,13 +130,13 @@ public class BluetoothService extends Service {
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public BluetoothService(Context context, Handler handler){
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        mState = STATE_NONE;
-        mNewState = mState;
-        mHandler = handler;
-
-    }
+//    public BluetoothService(Context context, Handler handler){
+//        mAdapter = BluetoothAdapter.getDefaultAdapter();
+//        mState = STATE_NONE;
+//        mNewState = mState;
+//        mHandler = handler;
+//
+//    }
 
     /**
      * Update UI title according to the current state of the chat connection

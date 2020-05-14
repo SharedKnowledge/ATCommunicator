@@ -7,15 +7,18 @@ import android.app.NotificationManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 
 public class MyApplication extends Application {
 
     public static final String TAG = "MyApplication";
+
     public static final String CHANNEL_ID = "ServiceChannel";
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG, "onCreate: MyApplication created");
         createNotificationChannel();
     }
 

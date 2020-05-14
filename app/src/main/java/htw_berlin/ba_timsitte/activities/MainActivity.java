@@ -46,6 +46,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setUpHomeButton();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     // ----------------- Toolbar methods -----------------
 
     private void setUpHomeButton(){

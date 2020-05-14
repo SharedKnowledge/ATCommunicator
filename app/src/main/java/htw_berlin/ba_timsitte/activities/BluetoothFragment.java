@@ -45,6 +45,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     private static final String TAG = "BluetoothFragment";
 
     private String mConnectedDeviceName = null;
+    public BluetoothDevice mBluetoothDevice;
     private ArrayAdapter<String> mConversationArrayAdapter;
 
     BluetoothAdapter mBluetoothAdapter;
@@ -129,7 +130,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         }
         if (mBluetoothDevices.get(i).getBondState() == BluetoothDevice.BOND_BONDED){
             Log.d(TAG, "Clicked on bonded device.");
-            mConnectedDeviceName = mBluetoothDevices.get(i).getName();
+            mBluetoothDevice = mBluetoothDevices.get(i);
             startBluetoothService(getView());
         }
     }
@@ -138,7 +139,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     public void startBluetoothService(View view){
 
         Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
-        serviceIntent.putExtra("inputExtra", mConnectedDeviceName);
+        serviceIntent.putExtra("btdevice", mBluetoothDevice);
 
         getActivity().startService(serviceIntent);
     }
