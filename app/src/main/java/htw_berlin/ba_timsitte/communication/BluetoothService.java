@@ -1,11 +1,12 @@
 package htw_berlin.ba_timsitte.communication;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.bluetooth.BluetoothClass.Device;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
@@ -15,12 +16,19 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import htw_berlin.ba_timsitte.R;
+import htw_berlin.ba_timsitte.activities.MainActivity;
 import htw_berlin.ba_timsitte.activities.MyApplication;
+
+import static htw_berlin.ba_timsitte.activities.MyApplication.CHANNEL_ID;
 
 
 public class BluetoothService extends Service {
@@ -36,7 +44,7 @@ public class BluetoothService extends Service {
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
     // Member fields
     private BluetoothAdapter mAdapter;
-    private static Handler mHandler;
+    private Handler mHandler;
     private AcceptThread mAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
@@ -46,7 +54,7 @@ public class BluetoothService extends Service {
 
     // ----------------- Service stuff -----------------
 
-    private final IBinder mBinder = new LocalBinder();
+    // private final IBinder mBinder = new LocalBinder();
 
     @Override
     public void onCreate() {
@@ -60,10 +68,12 @@ public class BluetoothService extends Service {
         super.onDestroy();
     }
 
+    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        mHandler = ((MyApplication) getApplication()).getHandler();
-        return mBinder;
+        //mHandler = ((MyApplication) getApplication()).getHandler();
+        //return mBinder;
+        return null;
     }
 
     public class LocalBinder extends Binder {
@@ -74,36 +84,49 @@ public class BluetoothService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("BTConn", "Onstart Command");
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mAdapter != null) {
-            //device = (BluetoothDevice) intent.getExtras();
-            //device = intent.getExtras().getParcelable("btdevice");
-            device = intent.getParcelableExtra("btdevice");
-            String macAddress = device.getAddress();
-            if (macAddress != null && macAddress.length() > 0) {
-                connect(device);
-            } else {
-                stopSelf();
-                // return 0;
-                return START_NOT_STICKY;
-            }
-        }
-        String stopservice = intent.getStringExtra("stopservice");
-        if (stopservice != null && stopservice.length() > 0) {
-            stop();
-        }
-        return START_STICKY;
+//        Log.d("BTConn", "Onstart Command");
+//        mAdapter = BluetoothAdapter.getDefaultAdapter();
+//        if (mAdapter != null) {
+//            //device = (BluetoothDevice) intent.getExtras();
+//            //device = intent.getExtras().getParcelable("btdevice");
+//            device = intent.getParcelableExtra("btdevice");
+//            String macAddress = device.getAddress();
+//            if (macAddress != null && macAddress.length() > 0) {
+//                connect(device);
+//            } else {
+//                stopSelf();
+//                // return 0;
+//                return START_NOT_STICKY;
+//            }
+//        }
+//        String stopservice = intent.getStringExtra("stopservice");
+//        if (stopservice != null && stopservice.length() > 0) {
+//            stop();
+//        }
+//        return START_STICKY;
+        String input = intent.getStringExtra("inputExtra");
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Bluetooth Service")
+                .setContentText(input)
+                .setSmallIcon(R.drawable.ic_applauncher)
+                .setContentIntent(pendingIntent)
+                .build();
+        startForeground(1, notification);
+
+        return START_NOT_STICKY; // START_REDELIVER_INTENT probably makes even more sense
     }
 
 
     // ----------------- BluetoothService stuff -----------------
 
     public BluetoothService(){
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        mState = STATE_NONE;
-        mNewState = mState;
-        mHandler = ((MyApplication) getApplication()).getHandler();
+//        mAdapter = BluetoothAdapter.getDefaultAdapter();
+//        mState = STATE_NONE;
+//        mNewState = mState;
+//        mHandler = ((MyApplication) getApplication()).getHandler();
     }
 
     /**
