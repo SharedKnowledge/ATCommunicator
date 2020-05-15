@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.LongDef;
 import androidx.core.content.ContextCompat;
 
 import org.w3c.dom.Text;
@@ -54,20 +55,17 @@ public class BluetoothDeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
             }
             if (deviceStatus != null){
                 if (device.getBondState() == BluetoothDevice.BOND_NONE) {
-                    Log.d(TAG, "colorDeviceBondNone");
                     deviceStatus.setBackgroundResource(R.color.colorDeviceBondNone);
                 } else if (device.getBondState() == BluetoothDevice.BOND_BONDING){
-                    Log.d(TAG, "colorDeviceBonding");
                     deviceStatus.setBackgroundResource(R.color.colorDeviceBonding);
                 } else if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
-                    Log.d(TAG, "colorDeviceBonded");
                     deviceStatus.setBackgroundResource(R.color.colorDeviceBonded);
                 } else {
-                    Log.d(TAG, "Nothing.");
                     deviceStatus.setBackgroundResource(R.color.colorDeviceUnclear);
                 }
 
             }
+            Log.d(TAG, "getView: " + device.getName() + " with " + device.getAddress() + "STATE: " + device.getBondState());
         }
         return convertView;
     }

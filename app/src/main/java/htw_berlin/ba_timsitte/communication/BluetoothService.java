@@ -1,6 +1,5 @@
 package htw_berlin.ba_timsitte.communication;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -8,7 +7,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
@@ -37,7 +35,7 @@ public class BluetoothService extends Service {
     private final String TAG = "BluetoothService";
 
     public static final String BT_DEVICE = "btdevice";
-    private static final String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB";
+    private static final String MY_UUID = "00001101-0000-1000-8000-00805f9b34fb";
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
@@ -73,7 +71,7 @@ public class BluetoothService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        mHandler = ((MyApplication) getApplication()).getHandler();
+        // mHandler = ((MyApplication) getApplication()).getHandler();
         return mBinder;
         //return null;
     }
@@ -89,13 +87,14 @@ public class BluetoothService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("BTConn", "Onstart Command");
+        mHandler = ((MyApplication) getApplication()).getHandler();
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mAdapter != null) {
             device = intent.getExtras().getParcelable("btdevice");
             device = intent.getParcelableExtra("btdevice");
             String macAddress = device.getAddress();
             if (macAddress != null && macAddress.length() > 0) {
-                // connect(device);
+                connect(device);
             } else {
                 stopSelf();
                 return START_NOT_STICKY;
