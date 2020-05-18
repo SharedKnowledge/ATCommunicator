@@ -47,7 +47,6 @@ public class MyApplication extends Application {
 
     Handler.Callback realCallback = null;
 
-    @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (realCallback != null) {

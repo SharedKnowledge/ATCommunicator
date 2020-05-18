@@ -24,7 +24,6 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 import htw_berlin.ba_timsitte.R;
-import htw_berlin.ba_timsitte.activities.MainActivity;
 import htw_berlin.ba_timsitte.activities.MyApplication;
 
 import static htw_berlin.ba_timsitte.activities.MyApplication.CHANNEL_ID;
@@ -49,6 +48,7 @@ public class BluetoothService extends Service {
     private ConnectedThread mConnectedThread;
     private int mState;
     private int mNewState;
+
     public static BluetoothDevice device = null;
 
 
@@ -71,13 +71,13 @@ public class BluetoothService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        // mHandler = ((MyApplication) getApplication()).getHandler();
+        mHandler = ((MyApplication) getApplication()).getHandler();
         return mBinder;
-        //return null;
     }
 
     public class LocalBinder extends Binder {
-        BluetoothService getService() {
+
+        public BluetoothService getService() {
             return BluetoothService.this;
         }
     }
@@ -86,8 +86,8 @@ public class BluetoothService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("BTConn", "Onstart Command");
-        mHandler = ((MyApplication) getApplication()).getHandler();
+        Log.d(TAG, "Onstart Command");
+        // mHandler = ((MyApplication) getApplication()).getHandler();
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mAdapter != null) {
             device = intent.getExtras().getParcelable("btdevice");

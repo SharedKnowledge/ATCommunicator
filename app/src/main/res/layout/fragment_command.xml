@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -27,28 +27,20 @@
             android:layout_weight="5"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/layoutTerminal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/layoutSecondToolbar"
-        android:layout_above="@+id/layoutFunctionToolbar">
-        <TextView
-            android:id="@+id/terminalView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@color/colorText"
-            android:maxLines="20"
-            android:lines="20">
-        </TextView>
-    </LinearLayout>
-
     <TextView
-        android:background="@drawable/border_set"
-        android:layout_below="@+id/layoutTerminal"
-        android:layout_above="@+id/layoutFunctionToolbar"
-        android:layout_height="2dp"
-        android:layout_width="match_parent" />
+        android:id="@+id/terminalView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:freezesText="true"
+        android:gravity="bottom"
+        android:scrollbars="vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <View
+        android:layout_width="match_parent"
+        android:background="?android:attr/listDivider"
+        android:layout_height="2dp" />
 
     <LinearLayout
         android:id="@+id/layoutFunctionToolbar"
@@ -73,4 +65,4 @@
             android:text="Send" />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

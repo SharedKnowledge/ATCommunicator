@@ -13,17 +13,19 @@ import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,21 +39,15 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     @BindView(R.id.btnDiscover) Button mbtnDiscover;
     @BindView(R.id.lvDevices) ListView mlvDevices;
     @BindView(R.id.btnStartService) Button mbtnStartService;
-
-    // Intent request codes
-    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
-    private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
-    private static final int REQUEST_ENABLE_BT = 3;
+    @BindView(R.id.discoverState) TextView disoverStatus;
 
     private static final String TAG = "BluetoothFragment";
 
-    private String mConnectedDeviceName = null;
-    public BluetoothDevice mBluetoothDevice;
-    private ArrayAdapter<String> mConversationArrayAdapter;
+    private BluetoothDevice mBluetoothDevice;
 
     BluetoothAdapter mBluetoothAdapter;
-    public ArrayList<BluetoothDevice> mBluetoothDevices = new ArrayList<>();
-    public BluetoothDeviceListAdapter mBluetoothDeviceListAdapter;
+    private ArrayList<BluetoothDevice> mBluetoothDevices = new ArrayList<>();
+    private BluetoothDeviceListAdapter mBluetoothDeviceListAdapter;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -75,8 +71,40 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         super.onStart();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Register a local broadcast manager to listen
+        LocalBroadcastManager locationBroadcastManager = LocalBroadcastManager.getInstance(getContext());
+
+        // mBroadcastReceiver1 for listing devices
+        IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        locationBroadcastManager.registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
+
+        // mBroadcastReceiver2 for discovery state
+        IntentFilter discoverStateIntent = new IntentFilter();
+        discoverStateIntent.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        discoverStateIntent.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        discoverStateIntent.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        locationBroadcastManager.registerReceiver(mBroadcastReceiver2, discoverStateIntent);
+
+        // mBroadcastReceiver for bluetooth state
+        IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        locationBroadcastManager.registerReceiver(mBroadcastReceiver3, intentFilter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager locationBroadcastManager = LocalBroadcastManager.getInstance(getContext());
+        locationBroadcastManager.unregisterReceiver(mBroadcastReceiver1);
+        locationBroadcastManager.unregisterReceiver(mBroadcastReceiver2);
+        locationBroadcastManager.unregisterReceiver(mBroadcastReceiver3);
+    }
+
     /**
-     * Broadcast receiver for listing devices which are not yet paired
+     * Broadcast receiver for listing devices
      */
     private final BroadcastReceiver mBroadcastReceiver1 = new BroadcastReceiver() {
         @Override
@@ -87,14 +115,66 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (!mBluetoothDevices.contains(device)){
                     mBluetoothDevices.add(device);
+                    Log.d(TAG, "mBroadcastReceiver1: Added to list: " + device.getName() + ": " + device.getAddress());
                 }
-                Log.d(TAG, "onReceive " + device.getName() + ": " + device.getAddress());
+
                 mBluetoothDeviceListAdapter = new BluetoothDeviceListAdapter(context, R.layout.bluetooth_device_adapter_view, mBluetoothDevices);
                 mlvDevices.setAdapter(mBluetoothDeviceListAdapter);
             }
 
         }
     };
+
+    /**
+     * Broadcast receiver for discover state
+     */
+    private final BroadcastReceiver mBroadcastReceiver2 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_STARTED)){
+                Log.d(TAG, "mBroadcastReceiver2: Discovery process started");
+                disoverStatus.setText("Discovery in progress...");
+            }
+            else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)){
+                Log.d(TAG, "onReceive: Discovery finished");
+                disoverStatus.setText("Discovery ended.");
+            }
+        }
+    };
+
+    /**
+     * Broadcast receiver for changes made to bluetooth states
+     */
+    private final BroadcastReceiver mBroadcastReceiver3 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action.equals((BluetoothAdapter.ACTION_STATE_CHANGED))){
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+
+                switch (state){
+                    case BluetoothAdapter.STATE_OFF:
+                        Log.d(TAG, "mBroadcastReceiver3: STATE OFF");
+                        disoverStatus.setText("Please turn on Bluetooth.");
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_OFF:
+                        Log.d(TAG, "mBroadcastReceiver3: STATE TURNING OFF");
+                        break;
+                    case BluetoothAdapter.STATE_ON:
+                        Log.d(TAG, "mBroadcastReceiver3: STATE ON");
+                        disoverStatus.setText("Bluetooth on. Ready for discovering.");
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        Log.d(TAG, "mBroadcastReceiver3: STATE TURNING ON");
+                        break;
+                }
+            }
+        }
+    };
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @OnClick(R.id.btnDiscover)
@@ -103,21 +183,23 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         mBluetoothDevices.clear();
         if (mBluetoothAdapter.isDiscovering()){
             mBluetoothAdapter.cancelDiscovery();
-            Log.d(TAG, "discovery: Danceling discovery.");
+            Log.d(TAG, "discovery: Canceling discovery.");
 
             checkBTPermission();
 
             mBluetoothAdapter.startDiscovery();
-            IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            getActivity().registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
+//            IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+//            getActivity().registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
         }
 
         if (!mBluetoothAdapter.isDiscovering()){
             checkBTPermission();
             mBluetoothAdapter.startDiscovery();
-            IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            getActivity().registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
+//            IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+//            getActivity().registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
         }
+        IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        getActivity().registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
     }
 
     @Override
@@ -137,18 +219,22 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         if (mBluetoothDevices.get(i).getBondState() == BluetoothDevice.BOND_BONDED){
             Log.d(TAG, "Clicked on bonded device.");
             mBluetoothDevice = mBluetoothDevices.get(i);
-            startBluetoothService(getView());
+            ((MainActivity) Objects.requireNonNull(getActivity())).startBluetoothService(mBluetoothDevice);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CommandFragment()).commit();
+            //startBluetoothService(getView());
         }
     }
 
-    @OnClick(R.id.btnStartService)
-    public void startBluetoothService(View view){
-
-        Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
-        serviceIntent.putExtra("btdevice", mBluetoothDevice);
-
-        getActivity().startService(serviceIntent);
-    }
+//    @OnClick(R.id.btnStartService)
+//    public void startBluetoothService(View view){
+//
+//
+//
+//        Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
+//        serviceIntent.putExtra("btdevice", mBluetoothDevice);
+//
+//        getActivity().startService(serviceIntent);
+//    }
 
     public void stopBluetoothService(View view){
         Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
@@ -165,8 +251,8 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkBTPermission(){
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-            int permissionCheck = getActivity().checkSelfPermission("Manifest.permission.ACCES_FINE_LOCATION");
-            permissionCheck += getActivity().checkSelfPermission("Manifest.permission.ACCES_COARSE_LOCATION");
+            int permissionCheck = getActivity().checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
+            permissionCheck += getActivity().checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
             if (permissionCheck != 0){
                 this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
             } else {

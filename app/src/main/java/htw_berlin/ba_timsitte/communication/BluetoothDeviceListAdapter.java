@@ -65,7 +65,6 @@ public class BluetoothDeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
                 }
 
             }
-            Log.d(TAG, "getView: " + device.getName() + " with " + device.getAddress() + "STATE: " + device.getBondState());
         }
         return convertView;
     }

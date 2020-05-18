@@ -9,7 +9,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.bluetooth.BluetoothDevice;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
@@ -17,14 +23,21 @@ import com.google.android.material.navigation.NavigationView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import htw_berlin.ba_timsitte.R;
+import htw_berlin.ba_timsitte.communication.BluetoothService;
 import htw_berlin.ba_timsitte.network.AODVNetworkProtocol;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+
+    private static final String TAG = "MainActivity";
     @BindView(R.id.app_toolbar) Toolbar mToolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @BindView(R.id.navigationView) NavigationView navigationView;
 
     AODVNetworkProtocol protocol = AODVNetworkProtocol.getInstance();
+
+    BluetoothService mBluetoothService;
+    boolean isBound = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +57,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         setSupportActionBar(mToolbar);
         setUpHomeButton();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -112,4 +131,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return true;
     }
+
+    // ----------------- Service methods -----------------
+
+    public void startBluetoothService(BluetoothDevice btdevice){
+        Log.d(TAG, "startBluetoothService: ");
+        Intent intent = new Intent(this, BluetoothService.class);
+        intent.putExtra("btdevice", btdevice);
+        //mBluetoothService.onBind(intent);
+        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+        startService(intent);
+
+    }
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            BluetoothService.LocalBinder myBinder = (BluetoothService.LocalBinder) service;
+            mBluetoothService = myBinder.getService();
+            isBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isBound = false;
+            mBluetoothService = null;
+        }
+    };
+
+
 }

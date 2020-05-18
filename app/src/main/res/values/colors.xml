@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#1f1e1c</color>
     <color name="colorAccent">#7d7a72</color>
     <color name="colorText">#F2F3F4</color>
+    <color name="colorTextSend">#dbb339</color>
     <color name="colorDeviceBondNone">#f1f2f0</color>
     <color name="colorDeviceBonding">#f1fa00</color>
     <color name="colorDeviceBonded">#00db12</color>
