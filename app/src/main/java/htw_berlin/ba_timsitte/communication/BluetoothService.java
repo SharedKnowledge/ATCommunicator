@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
@@ -86,7 +87,7 @@ public class BluetoothService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "Onstart Command");
+        Log.d(TAG, "onStartCommand");
         // mHandler = ((MyApplication) getApplication()).getHandler();
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mAdapter != null) {
@@ -95,21 +96,23 @@ public class BluetoothService extends Service {
             String macAddress = device.getAddress();
             if (macAddress != null && macAddress.length() > 0) {
                 connect(device);
+
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+                Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                        .setContentTitle("AT Communications")
+                        .setContentText("Connected with " + device.getName() + ": " + device.getAddress())
+                        .setSmallIcon(R.drawable.ic_applauncher)
+                        .setContentIntent(pendingIntent)
+                        .build();
+                startForeground(1, notification);
+
             } else {
                 stopSelf();
+                stopForeground(true);
                 return START_NOT_STICKY;
             }
         }
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("AT Communications")
-                .setContentText("Connected with " + device.getName() + ": " + device.getAddress())
-                .setSmallIcon(R.drawable.ic_applauncher)
-                .setContentIntent(pendingIntent)
-                .build();
-        startForeground(1, notification);
 
         String stopservice = intent.getStringExtra("stopservice");
         if (stopservice != null && stopservice.length() > 0) {
@@ -551,6 +554,7 @@ public class BluetoothService extends Service {
                 // Share the sent message back to the UI Activity
                 mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
                         .sendToTarget();
+                Log.d(TAG, "write: " + buffer.toString());
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }

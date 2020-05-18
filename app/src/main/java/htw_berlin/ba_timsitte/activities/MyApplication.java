@@ -15,6 +15,8 @@ public class MyApplication extends Application {
 
     public static final String CHANNEL_ID = "ServiceChannel";
 
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -27,10 +29,6 @@ public class MyApplication extends Application {
         super.onConfigurationChanged(newConfig);
     }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-    }
 
     private void createNotificationChannel(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -47,6 +45,7 @@ public class MyApplication extends Application {
 
     Handler.Callback realCallback = null;
 
+    @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (realCallback != null) {

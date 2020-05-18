@@ -39,7 +39,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     @BindView(R.id.btnDiscover) Button mbtnDiscover;
     @BindView(R.id.lvDevices) ListView mlvDevices;
     @BindView(R.id.btnStartService) Button mbtnStartService;
-    @BindView(R.id.discoverState) TextView disoverStatus;
+    @BindView(R.id.discoverState) TextView discoverStatus;
 
     private static final String TAG = "BluetoothFragment";
 
@@ -81,17 +81,6 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         // mBroadcastReceiver1 for listing devices
         IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         locationBroadcastManager.registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
-
-        // mBroadcastReceiver2 for discovery state
-        IntentFilter discoverStateIntent = new IntentFilter();
-        discoverStateIntent.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        discoverStateIntent.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        discoverStateIntent.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        locationBroadcastManager.registerReceiver(mBroadcastReceiver2, discoverStateIntent);
-
-        // mBroadcastReceiver for bluetooth state
-        IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-        locationBroadcastManager.registerReceiver(mBroadcastReceiver3, intentFilter);
     }
 
     @Override
@@ -99,8 +88,6 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         super.onPause();
         LocalBroadcastManager locationBroadcastManager = LocalBroadcastManager.getInstance(getContext());
         locationBroadcastManager.unregisterReceiver(mBroadcastReceiver1);
-        locationBroadcastManager.unregisterReceiver(mBroadcastReceiver2);
-        locationBroadcastManager.unregisterReceiver(mBroadcastReceiver3);
     }
 
     /**
@@ -125,57 +112,6 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         }
     };
 
-    /**
-     * Broadcast receiver for discover state
-     */
-    private final BroadcastReceiver mBroadcastReceiver2 = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-
-            if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_STARTED)){
-                Log.d(TAG, "mBroadcastReceiver2: Discovery process started");
-                disoverStatus.setText("Discovery in progress...");
-            }
-            else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)){
-                Log.d(TAG, "onReceive: Discovery finished");
-                disoverStatus.setText("Discovery ended.");
-            }
-        }
-    };
-
-    /**
-     * Broadcast receiver for changes made to bluetooth states
-     */
-    private final BroadcastReceiver mBroadcastReceiver3 = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            if (action.equals((BluetoothAdapter.ACTION_STATE_CHANGED))){
-                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
-
-                switch (state){
-                    case BluetoothAdapter.STATE_OFF:
-                        Log.d(TAG, "mBroadcastReceiver3: STATE OFF");
-                        disoverStatus.setText("Please turn on Bluetooth.");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_OFF:
-                        Log.d(TAG, "mBroadcastReceiver3: STATE TURNING OFF");
-                        break;
-                    case BluetoothAdapter.STATE_ON:
-                        Log.d(TAG, "mBroadcastReceiver3: STATE ON");
-                        disoverStatus.setText("Bluetooth on. Ready for discovering.");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        Log.d(TAG, "mBroadcastReceiver3: STATE TURNING ON");
-                        break;
-                }
-            }
-        }
-    };
-
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @OnClick(R.id.btnDiscover)
     public void discovery(View view){
@@ -188,15 +124,11 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
             checkBTPermission();
 
             mBluetoothAdapter.startDiscovery();
-//            IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-//            getActivity().registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
         }
 
         if (!mBluetoothAdapter.isDiscovering()){
             checkBTPermission();
             mBluetoothAdapter.startDiscovery();
-//            IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-//            getActivity().registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
         }
         IntentFilter discoveryDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         getActivity().registerReceiver(mBroadcastReceiver1, discoveryDevicesIntent);
@@ -225,17 +157,6 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         }
     }
 
-//    @OnClick(R.id.btnStartService)
-//    public void startBluetoothService(View view){
-//
-//
-//
-//        Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
-//        serviceIntent.putExtra("btdevice", mBluetoothDevice);
-//
-//        getActivity().startService(serviceIntent);
-//    }
-
     public void stopBluetoothService(View view){
         Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
         getActivity().stopService(serviceIntent);
@@ -260,4 +181,15 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
             }
         }
     }
+
+    // ----------------- Getter/Setter -----------------
+
+    public void setDiscoverStatus(String status) {
+        discoverStatus.setText(status);
+    }
+
+    public Button getMbtnDiscover() {
+        return mbtnDiscover;
+    }
+
 }

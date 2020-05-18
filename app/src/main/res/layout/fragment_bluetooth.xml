@@ -30,7 +30,7 @@
         android:id="@+id/discoverState"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:text="Empty"
+        android:text="No activity"
         android:textColor="@color/colorText"/>
 
     <ListView
