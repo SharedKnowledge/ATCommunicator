@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
@@ -190,7 +191,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //mBluetoothService.onBind(intent);
         bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
         startService(intent);
+    }
 
+    public void stopBluetoothService(View view){
+        Intent serviceIntent = new Intent(this, BluetoothService.class);
+        stopService(serviceIntent);
     }
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {

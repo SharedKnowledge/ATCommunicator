@@ -51,6 +51,7 @@ public class BluetoothService extends Service {
     private int mNewState;
 
     public static BluetoothDevice device = null;
+    private TerminalText mTerminalText = TerminalText.getInstance();
 
 
     // ----------------- Service stuff -----------------
@@ -125,13 +126,19 @@ public class BluetoothService extends Service {
 
     // ----------------- BluetoothService stuff -----------------
 
-
-    /**
-     * Constructor. Prepares a new BluetoothService session.
-     *
-     * @param context The UI Activity Context
-     * @param handler A Handler to send messages back to the UI Activity
-     */
+//    public BluetoothService() {
+//        mAdapter = BluetoothAdapter.getDefaultAdapter();
+//        mState = STATE_NONE;
+//        mNewState = mState;
+//        mHandler = ((MyApplication) getApplication()).getHandler();
+//    }
+//
+//    /**
+//     * Constructor. Prepares a new BluetoothService session.
+//     *
+//     * @param context The UI Activity Context
+//     * @param handler A Handler to send messages back to the UI Activity
+//     */
 //    public BluetoothService(Context context, Handler handler){
 //        mAdapter = BluetoothAdapter.getDefaultAdapter();
 //        mState = STATE_NONE;
@@ -195,7 +202,6 @@ public class BluetoothService extends Service {
      */
     public synchronized void connect(BluetoothDevice device) {
         Log.d(TAG, "connect to: " + device);
-
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
             if (mConnectThread != null) {
@@ -226,7 +232,6 @@ public class BluetoothService extends Service {
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice
             device, final String socketType) {
         Log.d(TAG, "connected, Socket Type:" + socketType);
-
         // Cancel the thread that completed the connection
         if (mConnectThread != null) {
             mConnectThread.cancel();

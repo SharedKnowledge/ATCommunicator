@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import htw_berlin.ba_timsitte.R;
 import htw_berlin.ba_timsitte.communication.BluetoothService;
+import htw_berlin.ba_timsitte.communication.TerminalText;
 import htw_berlin.ba_timsitte.persistence.FileHandler;
 
 public class CommandFragment extends Fragment {
@@ -30,6 +31,7 @@ public class CommandFragment extends Fragment {
     @BindView(R.id.terminalView) TextView terminalView;
     @BindView(R.id.btnSend) Button btnSend;
     @BindView(R.id.sendCommand) EditText sendCommand;
+    @BindView(R.id.connectedToTextView) TextView connectedToTextView;
 
     private enum Connected { False, Pending, True }
     private Connected connected = Connected.False;
@@ -38,6 +40,8 @@ public class CommandFragment extends Fragment {
     private BluetoothService mBluetoothService;
     private FileHandler mFileHandler;
     private String terminalData;
+
+    private TerminalText mTerminalText = TerminalText.getInstance();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,6 +55,7 @@ public class CommandFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // terminalView.setText(mTerminalText.getText());
     }
 
     @Override
@@ -69,6 +74,7 @@ public class CommandFragment extends Fragment {
         try {
             SpannableStringBuilder spn = new SpannableStringBuilder(str+'\n');
             spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorTextSend)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mTerminalText.appendText(str);
             terminalView.append(spn);
             byte[] data = (str + newline).getBytes();
             mBluetoothService.write(data);
@@ -79,5 +85,24 @@ public class CommandFragment extends Fragment {
 
     public void receiveData(byte[] data){
         terminalView.append(new String(data));
+    }
+
+    public void appendTextToTerminalView(String str) {
+        try {
+            SpannableStringBuilder spn = new SpannableStringBuilder(str+'\n');
+            spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorTextSend)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mTerminalText.appendText(str);
+            terminalView.append(spn);
+            byte[] data = (str + newline).getBytes();
+            mBluetoothService.write(data);
+        } catch (Exception e) {
+            Log.e(TAG, String.valueOf(e));
+        }
+    }
+
+    // ----------------- Getter/Setter -----------------
+
+    public void setConnectedToTextViewText(String str) {
+        this.connectedToTextView.setText(str);
     }
 }

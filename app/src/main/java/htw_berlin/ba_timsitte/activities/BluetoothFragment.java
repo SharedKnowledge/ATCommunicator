@@ -157,11 +157,6 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         }
     }
 
-    public void stopBluetoothService(View view){
-        Intent serviceIntent = new Intent(getActivity(), BluetoothService.class);
-        getActivity().stopService(serviceIntent);
-    }
-
     /**
      * This method is required for all devices running on API23 or higher.
      * Android must check the permissions for bluetooth. Putting the proper permissions only in the

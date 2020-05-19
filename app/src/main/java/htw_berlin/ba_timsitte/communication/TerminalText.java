@@ -32,4 +32,10 @@ public class TerminalText {
     public void setText(String text) {
         this.text = text;
     }
+
+    public void appendText(String text){
+        StringBuilder stringBuilder = new StringBuilder(this.text);
+        stringBuilder.append("\n");
+        this.text = stringBuilder.toString();
+    }
 }
