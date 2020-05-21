@@ -1,6 +1,7 @@
 package htw_berlin.ba_timsitte.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -25,14 +26,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import htw_berlin.ba_timsitte.R;
 import htw_berlin.ba_timsitte.communication.BluetoothDeviceListAdapter;
-import htw_berlin.ba_timsitte.communication.BluetoothService;
 
 public class BluetoothFragment extends Fragment implements AdapterView.OnItemClickListener {
 
@@ -48,6 +47,8 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
     BluetoothAdapter mBluetoothAdapter;
     private ArrayList<BluetoothDevice> mBluetoothDevices = new ArrayList<>();
     private BluetoothDeviceListAdapter mBluetoothDeviceListAdapter;
+
+    public static String EXTRA_DEVICE_ADDRESS = null;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -151,9 +152,11 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
         if (mBluetoothDevices.get(i).getBondState() == BluetoothDevice.BOND_BONDED){
             Log.d(TAG, "Clicked on bonded device.");
             mBluetoothDevice = mBluetoothDevices.get(i);
-            ((MainActivity) Objects.requireNonNull(getActivity())).startBluetoothService(mBluetoothDevice);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CommandFragment()).commit();
-            //startBluetoothService(getView());
+            EXTRA_DEVICE_ADDRESS = mBluetoothDevice.getAddress();
+
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, ((MainActivity) getActivity()).getCommandFragment()).commit();
         }
     }
 

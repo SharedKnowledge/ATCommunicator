@@ -10,19 +10,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -43,11 +37,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CommandFragment mCommandFragment;
     private MapFragment mMapFragment;
     private SettingsFragment mSettingsFragment;
-
-    AODVNetworkProtocol protocol = AODVNetworkProtocol.getInstance();
-
-    BluetoothService mBluetoothService;
-    boolean isBound = false;
 
 
     @Override
@@ -131,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_bluetooth:
-                loadFragment(mBluetoothFragment);
+                //loadFragment(mBluetoothFragment);
                 drawerLayout.closeDrawers();
                 break;
             case R.id.nav_command:
@@ -173,45 +162,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (fragment != null){
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction
-                    //.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                     .replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commit();
             Log.d(TAG, "loadFragment: " + fragment.toString());
         }
     }
-
-
-    // ----------------- Service methods -----------------
-
-    public void startBluetoothService(BluetoothDevice btdevice){
-        Log.d(TAG, "startBluetoothService: ");
-        Intent intent = new Intent(this, BluetoothService.class);
-        intent.putExtra("btdevice", btdevice);
-        //mBluetoothService.onBind(intent);
-        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
-        startService(intent);
-    }
-
-    public void stopBluetoothService(View view){
-        Intent serviceIntent = new Intent(this, BluetoothService.class);
-        stopService(serviceIntent);
-    }
-
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            BluetoothService.LocalBinder myBinder = (BluetoothService.LocalBinder) service;
-            mBluetoothService = myBinder.getService();
-            isBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            isBound = false;
-            mBluetoothService = null;
-        }
-    };
 
     // ----------------- BroadcastReceiver methods -----------------
     /**
@@ -248,14 +204,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 switch (state){
                     case BluetoothAdapter.STATE_OFF:
-                        Log.d(TAG, "mBroadcastReceiver3: STATE OFF");
+                        // Log.d(TAG, "mBroadcastReceiver3: STATE OFF");
                         mBluetoothFragment.setDiscoverStatus("Please turn on Bluetooth.");
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         Log.d(TAG, "mBroadcastReceiver3: STATE TURNING OFF");
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        Log.d(TAG, "mBroadcastReceiver3: STATE ON");
+                        // Log.d(TAG, "mBroadcastReceiver3: STATE ON");
                         mBluetoothFragment.setDiscoverStatus("Bluetooth on. Ready for discovering.");
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
@@ -280,4 +236,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     };
+
+    public CommandFragment getCommandFragment() {
+        return mCommandFragment;
+    }
 }

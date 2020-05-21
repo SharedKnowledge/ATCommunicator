@@ -13,8 +13,7 @@ import java.util.ArrayList;
 
 public class Node implements Parcelable{
 
-    private int id;
-    private String name;
+    private String addr;
     private boolean is_active = true;
     private GeoPoint gp;
 
@@ -31,12 +30,10 @@ public class Node implements Parcelable{
     };
 
     /**
-     * test constructor
-     * @param id
+     *
      */
-    public Node(int id){
-        this.id = id;
-        this.name = "default";
+    public Node(String addr){
+        this.addr = addr;
         this.is_active = true;
         // 10 minutes time to live
         timeToLive.start();
@@ -44,13 +41,11 @@ public class Node implements Parcelable{
 
     /**
      *
-     * @param id
      * @param lat
      * @param lon
      */
-    public Node(int id, String name, double lat, double lon){
-        this.id = id;
-        this.name = name;
+    public Node(String addr, double lat, double lon){
+        this.addr = addr;
         this.gp = new GeoPoint(lat, lon);
         this.is_active = true;
         timeToLive.start();
@@ -62,14 +57,6 @@ public class Node implements Parcelable{
         return true;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public boolean isIs_active() {
         return is_active;
     }
@@ -78,6 +65,8 @@ public class Node implements Parcelable{
         this.is_active = is_active;
         if (this.is_active = false){
             this.timeToLive.cancel();
+        } else {
+            this.timeToLive.start();
         }
     }
 
@@ -89,11 +78,18 @@ public class Node implements Parcelable{
         this.gp = gp;
     }
 
+    public String getAddr() {
+        return addr;
+    }
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
     // ----------------- make Node object parcelable -----------------
 
     protected Node(Parcel in) {
-        id = in.readInt();
-        name = in.readString();
+        addr = in.readString();
         is_active = in.readInt() == 1;
         double lat = in.readDouble();
         double lon = in.readDouble();
@@ -102,8 +98,7 @@ public class Node implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(name);
+        dest.writeString(addr);
         dest.writeInt(is_active ? 1 : 0);
         dest.writeDouble(gp.getLatitude());
         dest.writeDouble(gp.getLongitude());
