@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CommandFragment mCommandFragment;
     private MapFragment mMapFragment;
     private SettingsFragment mSettingsFragment;
+    private OverviewFragment mOverviewFragment;
 
 
     @Override
@@ -146,16 +147,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mCommandFragment = new CommandFragment();
         mMapFragment = new MapFragment();
         mSettingsFragment = new SettingsFragment();
+        mOverviewFragment = new OverviewFragment();
     }
 
     public void initiateFirstFragment(){
         // In case this activity was started with special instructions from an Intent,
         // pass the Intent's extras to the fragment as arguments
         mBluetoothFragment.setArguments(getIntent().getExtras());
-
+        mOverviewFragment.setArguments(getIntent().getExtras());
         // Add the fragment to the 'fragment_container' FrameLayout
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, mBluetoothFragment).commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, mBluetoothFragment)
+                .commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_overview, mOverviewFragment)
+                .commit();
     }
 
     public void loadFragment(Fragment fragment) {

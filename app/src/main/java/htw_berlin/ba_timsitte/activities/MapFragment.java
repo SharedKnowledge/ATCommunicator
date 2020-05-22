@@ -37,8 +37,6 @@ import htw_berlin.ba_timsitte.network.RouteEntry;
 
 public class MapFragment extends Fragment {
 
-    @BindView(R.id.lvDeviceList)
-    ListView listViewDeviceList;
     @BindView(R.id.mapView)
     MapView map = null;
 
@@ -67,8 +65,6 @@ public class MapFragment extends Fragment {
 //        Intent intent = getActivity().getIntent();
 //        nodeList = intent.getParcelableArrayListExtra("nodeList");
 
-        mAdapter = new MapDeviceListAdapter(getActivity(), nodeList);
-        listViewDeviceList.setAdapter(mAdapter);
 //        initiateMarkers();
         return view;
     }
@@ -133,19 +129,19 @@ public class MapFragment extends Fragment {
         }
     }
 
-    /**
-     * Enable/disable marker of node on map
-     * @param position
-     */
-    @OnItemClick(R.id.lvDeviceList)
-    public void onItemShowMarker(int position){
-        if (markerList.get(position).isEnabled()){
-            markerList.get(position).setEnabled(false);
-        } else {
-            markerList.get(position).setEnabled(true);
-        }
-        map.invalidate();
-    }
+//    /**
+//     * Enable/disable marker of node on map
+//     * @param position
+//     */
+//    @OnItemClick(R.id.lvDeviceList)
+//    public void onItemShowMarker(int position){
+//        if (markerList.get(position).isEnabled()){
+//            markerList.get(position).setEnabled(false);
+//        } else {
+//            markerList.get(position).setEnabled(true);
+//        }
+//        map.invalidate();
+//    }
 
     public void initiateMarkers(){
         for (Node d: nodeList){
