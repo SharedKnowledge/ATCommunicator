@@ -1,14 +1,12 @@
 package htw_berlin.ba_timsitte.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -106,7 +104,7 @@ public class BluetoothFragment extends Fragment implements AdapterView.OnItemCli
                     Log.d(TAG, "mBroadcastReceiver1: Added to list: " + device.getName() + ": " + device.getAddress());
                 }
 
-                mBluetoothDeviceListAdapter = new BluetoothDeviceListAdapter(context, R.layout.bluetooth_device_adapter_view, mBluetoothDevices);
+                mBluetoothDeviceListAdapter = new BluetoothDeviceListAdapter(context, R.layout.adapter_view_bluetooth_device, mBluetoothDevices);
                 mlvDevices.setAdapter(mBluetoothDeviceListAdapter);
             }
 

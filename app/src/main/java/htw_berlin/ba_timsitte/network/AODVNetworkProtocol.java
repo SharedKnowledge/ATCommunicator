@@ -155,36 +155,73 @@ public class AODVNetworkProtocol {
 
     }
 
-    public void receiveRouteRequest(String destination, int destSequence, String source, int sourceSequence, int hopCount){
+    public void receiveRouteRequest(String receivedFrom, String destination, int destSequence, String source, int sourceSequence, int hopCount){
+        // make a reverse entry for source node
+        addRouteEntry(source, receivedFrom, hopCount + 1);
+
+        // check whether we have routes to the destination in our routingTable
+        RouteEntry returnRouteEntry = lookUpRouteEntry(destination);
+        if (returnRouteEntry != null){
+
+        } else {
+            transmitRouteRequest(destination, destSequence, source, sourceSequence, hopCount);
+        }
+    }
+
+    public void transmitRouteReply(){
 
     }
 
-    /*
-    Route Replies (RREP)
-     */
-    public void routeReply(){
-
-    }
-
-    /*
-    Route Errors (RERR)
-     */
-    public void routeError(){
+    public void receiveRouteReply(){
 
     }
 
     /**
-     * Checks whether a Node already exists or not
-     * @param addr
-     * @return Node in case it already exists
+     *
+     * @param destination
+     * @param next
+     * @param hopCount
      */
-    public Node lookUpNode(String addr) {
-        for (Node node : nodeList) {
-            if (node.getAddr().equals(addr)) {
-                return node;
+    public void addRouteEntry(String destination, String next, int hopCount){
+        boolean exists = false;
+        RouteEntry routeEntry = new RouteEntry(0, destination, next, hopCount);
+        // check if routeEntry exists
+        for (RouteEntry entry : routingTable){
+            if (entry.equals(routeEntry)){
+                exists = true;
+                break;
             }
         }
-        return null;
+        if (!exists){
+            routingTable.add(routeEntry);
+        }
+    }
+
+    /**
+     * Checks if RouteEntry exists and if so returns the one with the least hops
+     * @param destination
+     * @return destination address of Node
+     */
+    public RouteEntry lookUpRouteEntry(String destination){
+        int hopCount = 0;
+        int newHopCount;
+        boolean first = true;
+        RouteEntry returnRouteEntry = null;
+        for (RouteEntry routeEntry : routingTable){
+            if (routeEntry.getDestination().equals(destination)){
+                newHopCount = routeEntry.getHop_count();
+                if (first){
+                    hopCount = newHopCount;
+                    first = false;
+                    returnRouteEntry = routeEntry;
+                } else {
+                    if (newHopCount < hopCount){
+                        returnRouteEntry = routeEntry;
+                    }
+                }
+            }
+        }
+        return returnRouteEntry;
     }
 
     /**
@@ -195,16 +232,27 @@ public class AODVNetworkProtocol {
         Node node = lookUpNode(addr);
         // it doesn't exist yet
         if (node == null){
+            Log.i(TAG, "updateNodeListWithNode: New Node added: " + addr);
             Node newNode = new Node(addr);
             nodeList.add(newNode);
         } else {
+            Log.i(TAG, "updateNodeListWithNode: Existing Node refreshed.");
             node.setIs_active(true);
         }
+    }
 
-
-
-
-        Log.i(TAG, "Node added: " + addr);
+    /**
+     * Checks whether a Node already exists or not and returns Node
+     * @param addr
+     * @return Node in case it already exists
+     */
+    public Node lookUpNode(String addr) {
+        for (Node node : nodeList) {
+            if (node.getAddr().equals(addr)) {
+                return node;
+            }
+        }
+        return null;
     }
 
     // ----------------- Getter/Setter -----------------

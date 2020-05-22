@@ -26,18 +26,19 @@ public class MapDeviceListAdapter extends ArrayAdapter<Node> {
         mContext = context;
         nodeList = list;
     }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View listItem = convertView;
         if(listItem == null)
-            listItem = LayoutInflater.from(mContext).inflate(R.layout.map_device_adapter_view, parent,false);
+            listItem = LayoutInflater.from(mContext).inflate(R.layout.adapter_view_map_device, parent,false);
 
         Node currentNode = nodeList.get(position);
 
 
         TextView id = (TextView) listItem.findViewById(R.id.map_deviceId);
-        id.setText(Integer.toString(currentNode.getId()));
+        id.setText(currentNode.getAddr());
 
         TextView gpLati = (TextView) listItem.findViewById(R.id.map_deviceGeoPointLatitude);
         gpLati.setText(Double.toString(currentNode.getGp().getLatitude()));

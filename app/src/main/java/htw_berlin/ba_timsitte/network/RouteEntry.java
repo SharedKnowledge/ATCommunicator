@@ -3,14 +3,14 @@ package htw_berlin.ba_timsitte.network;
 public class RouteEntry {
 
     private int sequence;
-    private Node destination;
-    private Node next;
+    private String destination;
+    private String next;
     private int hop_count;
 
     /*
 
      */
-    public RouteEntry(int sequence, Node destinationDevice, Node nextDevice, int hop_count){
+    public RouteEntry(int sequence, String destinationDevice, String nextDevice, int hop_count){
         this.sequence = sequence;
         this.destination = destinationDevice;
         this.next = nextDevice;
@@ -25,19 +25,19 @@ public class RouteEntry {
         this.sequence = sequence;
     }
 
-    public Node getDestination() {
+    public String getDestination() {
         return destination;
     }
 
-    public void setDestination(Node destination) {
+    public void setDestination(String destination) {
         this.destination = destination;
     }
 
-    public Node getNext() {
+    public String getNext() {
         return next;
     }
 
-    public void setNext(Node next) {
+    public void setNext(String next) {
         this.next = next;
     }
 

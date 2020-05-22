@@ -149,7 +149,7 @@ public class MapFragment extends Fragment {
 
     public void initiateMarkers(){
         for (Node d: nodeList){
-            Log.d(TAG, "Adding Marker " + d.getId());
+            Log.d(TAG, "Adding Marker " + d.getAddr());
             Marker mMarker = new Marker(map);
             GeoPoint gp = new GeoPoint(d.getGp().getLatitude(), d.getGp().getLongitude());
             mMarker.setPosition(gp);
@@ -161,7 +161,7 @@ public class MapFragment extends Fragment {
                     Color.BLACK
             );
             mMarker.setTextLabelFontSize(80);
-            mMarker.setTextIcon(Integer.toString(d.getId()));
+            mMarker.setTextIcon(d.getAddr());
             markerList.add(mMarker);
             map.getOverlays().add(mMarker);
         }
