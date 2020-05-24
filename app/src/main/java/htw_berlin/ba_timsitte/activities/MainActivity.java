@@ -23,8 +23,7 @@ import com.google.android.material.navigation.NavigationView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import htw_berlin.ba_timsitte.R;
-import htw_berlin.ba_timsitte.communication.BluetoothService;
-import htw_berlin.ba_timsitte.network.AODVNetworkProtocol;
+
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 

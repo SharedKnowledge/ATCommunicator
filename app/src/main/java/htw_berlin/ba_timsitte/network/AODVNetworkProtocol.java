@@ -157,7 +157,7 @@ public class AODVNetworkProtocol {
 
     public void receiveRouteRequest(String receivedFrom, String destination, int destSequence, String source, int sourceSequence, int hopCount){
         // make a reverse entry for source node
-        addRouteEntry(source, receivedFrom, hopCount + 1);
+        addRouteEntry(source, receivedFrom, destSequence,hopCount + 1);
 
         // check whether we have routes to the destination in our routingTable
         RouteEntry returnRouteEntry = lookUpRouteEntry(destination);
@@ -182,10 +182,10 @@ public class AODVNetworkProtocol {
      * @param next
      * @param hopCount
      */
-    public void addRouteEntry(String destination, String next, int hopCount){
+    public void addRouteEntry(String destination, String next, int sequence, int hopCount){
         boolean exists = false;
-        RouteEntry routeEntry = new RouteEntry(0, destination, next, hopCount);
-        // check if routeEntry exists
+        RouteEntry routeEntry = new RouteEntry(destination, next, sequence, hopCount);
+        // check if routeEntry exists and compare sequence
         for (RouteEntry entry : routingTable){
             if (entry.equals(routeEntry)){
                 exists = true;

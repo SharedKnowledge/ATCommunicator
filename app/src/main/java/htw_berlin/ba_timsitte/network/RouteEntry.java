@@ -10,10 +10,10 @@ public class RouteEntry {
     /*
 
      */
-    public RouteEntry(int sequence, String destinationDevice, String nextDevice, int hop_count){
-        this.sequence = sequence;
+    public RouteEntry(String destinationDevice, String nextDevice, int sequence, int hop_count){
         this.destination = destinationDevice;
         this.next = nextDevice;
+        this.sequence = sequence;
         this.hop_count = hop_count;
     }
 
