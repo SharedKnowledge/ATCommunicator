@@ -14,17 +14,16 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import htw_berlin.ba_timsitte.R;
-import htw_berlin.ba_timsitte.network.MapDeviceListAdapter;
-import htw_berlin.ba_timsitte.network.RouteEntry;
-import htw_berlin.ba_timsitte.network.RouteEntryListAdapter;
+import htw_berlin.ba_timsitte.network.Route;
+import htw_berlin.ba_timsitte.network.RouteListAdapter;
 
 
 public class OverviewFragment extends Fragment {
 
     @BindView(R.id.overview_routingTable) ListView listViewRoutingTable;
 
-    public ArrayList<RouteEntry> routingTable = new ArrayList<>();
-    private RouteEntryListAdapter mAdapter;
+    public ArrayList<Route> routingTable = new ArrayList<>();
+    private RouteListAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,7 +37,7 @@ public class OverviewFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_overview, container, false);
         ButterKnife.bind(this, view);
 
-        mAdapter = new RouteEntryListAdapter(getActivity(), routingTable);
+        mAdapter = new RouteListAdapter(getActivity(), routingTable);
         listViewRoutingTable.setAdapter(mAdapter);
 
         return view;

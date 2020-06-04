@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -29,11 +28,10 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnItemClick;
 import htw_berlin.ba_timsitte.R;
 import htw_berlin.ba_timsitte.network.MapDeviceListAdapter;
 import htw_berlin.ba_timsitte.network.Node;
-import htw_berlin.ba_timsitte.network.RouteEntry;
+import htw_berlin.ba_timsitte.network.Route;
 
 public class MapFragment extends Fragment {
 
@@ -44,7 +42,7 @@ public class MapFragment extends Fragment {
 
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     public ArrayList<Node> nodeList = new ArrayList<>();
-    public ArrayList<RouteEntry> routingTable = new ArrayList<>();
+    public ArrayList<Route> routingTable = new ArrayList<>();
     private ArrayList<Marker> markerList = new ArrayList<>();
     private MapDeviceListAdapter mAdapter;
 

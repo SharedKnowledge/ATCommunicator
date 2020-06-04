@@ -1,6 +1,6 @@
 package htw_berlin.ba_timsitte.network;
 
-public class RouteEntry {
+public class Route {
 
     private int sequence;
     private String destination;
@@ -10,7 +10,7 @@ public class RouteEntry {
     /*
 
      */
-    public RouteEntry(String destinationDevice, String nextDevice, int sequence, int hop_count){
+    public Route(String destinationDevice, String nextDevice, int sequence, int hop_count){
         this.destination = destinationDevice;
         this.next = nextDevice;
         this.sequence = sequence;

@@ -3,19 +3,16 @@ package htw_berlin.ba_timsitte.network;
 import android.os.Handler;
 import android.util.Log;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import htw_berlin.ba_timsitte.R;
 import htw_berlin.ba_timsitte.communication.BluetoothService;
-import htw_berlin.ba_timsitte.communication.Constants;
 
 public class AODVNetworkProtocol {
 
     private String TAG = "AODVNetworkProtocol";
 
-    private ArrayList<RouteEntry> routingTable = new ArrayList<>();
+    private ArrayList<Route> routingTable = new ArrayList<>();
     private ArrayList<Node> nodeList = new ArrayList<>();
     private AtomicInteger id = new AtomicInteger(0);
     private final Handler mHandler;
@@ -160,8 +157,8 @@ public class AODVNetworkProtocol {
         addRouteEntry(source, receivedFrom, destSequence,hopCount + 1);
 
         // check whether we have routes to the destination in our routingTable
-        RouteEntry returnRouteEntry = lookUpRouteEntry(destination);
-        if (returnRouteEntry != null){
+        Route returnRoute = lookUpRouteEntry(destination);
+        if (returnRoute != null){
 
         } else {
             transmitRouteRequest(destination, destSequence, source, sourceSequence, hopCount);
@@ -184,16 +181,16 @@ public class AODVNetworkProtocol {
      */
     public void addRouteEntry(String destination, String next, int sequence, int hopCount){
         boolean exists = false;
-        RouteEntry routeEntry = new RouteEntry(destination, next, sequence, hopCount);
+        Route route = new Route(destination, next, sequence, hopCount);
         // check if routeEntry exists and compare sequence
-        for (RouteEntry entry : routingTable){
-            if (entry.equals(routeEntry)){
+        for (Route entry : routingTable){
+            if (entry.equals(route)){
                 exists = true;
                 break;
             }
         }
         if (!exists){
-            routingTable.add(routeEntry);
+            routingTable.add(route);
         }
     }
 
@@ -202,26 +199,26 @@ public class AODVNetworkProtocol {
      * @param destination
      * @return destination address of Node
      */
-    public RouteEntry lookUpRouteEntry(String destination){
+    public Route lookUpRouteEntry(String destination){
         int hopCount = 0;
         int newHopCount;
         boolean first = true;
-        RouteEntry returnRouteEntry = null;
-        for (RouteEntry routeEntry : routingTable){
-            if (routeEntry.getDestination().equals(destination)){
-                newHopCount = routeEntry.getHop_count();
+        Route returnRoute = null;
+        for (Route route : routingTable){
+            if (route.getDestination().equals(destination)){
+                newHopCount = route.getHop_count();
                 if (first){
                     hopCount = newHopCount;
                     first = false;
-                    returnRouteEntry = routeEntry;
+                    returnRoute = route;
                 } else {
                     if (newHopCount < hopCount){
-                        returnRouteEntry = routeEntry;
+                        returnRoute = route;
                     }
                 }
             }
         }
-        return returnRouteEntry;
+        return returnRoute;
     }
 
     /**
@@ -257,7 +254,7 @@ public class AODVNetworkProtocol {
 
     // ----------------- Getter/Setter -----------------
 
-    public ArrayList<RouteEntry> getRoutingTable() {
+    public ArrayList<Route> getRoutingTable() {
         return routingTable;
     }
 

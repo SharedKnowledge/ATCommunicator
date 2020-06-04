@@ -17,14 +17,14 @@ import java.util.List;
 
 import htw_berlin.ba_timsitte.R;
 
-public class RouteEntryListAdapter extends ArrayAdapter<RouteEntry> {
+public class RouteListAdapter extends ArrayAdapter<Route> {
     private Context mContext;
-    private List<RouteEntry> routeEntryList = new ArrayList<>();
+    private List<Route> routeList = new ArrayList<>();
 
-    public RouteEntryListAdapter(@NonNull Context context, @SuppressLint("SupportAnnotationUsage") @LayoutRes ArrayList<RouteEntry> list) {
+    public RouteListAdapter(@NonNull Context context, @SuppressLint("SupportAnnotationUsage") @LayoutRes ArrayList<Route> list) {
         super(context, 0, list);
         mContext = context;
-        routeEntryList = list;
+        routeList = list;
     }
 
     @NonNull
@@ -34,19 +34,19 @@ public class RouteEntryListAdapter extends ArrayAdapter<RouteEntry> {
         if(listItem == null)
             listItem = LayoutInflater.from(mContext).inflate(R.layout.adapter_view_route_entry, parent,false);
 
-        RouteEntry currentRouteEntry = routeEntryList.get(position);
+        Route currentRoute = routeList.get(position);
 
         TextView destination = (TextView) listItem.findViewById(R.id.av_destination);
-        destination.setText(currentRouteEntry.getDestination());
+        destination.setText(currentRoute.getDestination());
 
         TextView next = (TextView) listItem.findViewById(R.id.av_next);
-        next.setText(currentRouteEntry.getNext());
+        next.setText(currentRoute.getNext());
 
         TextView hopCount = (TextView) listItem.findViewById(R.id.av_hopcount);
-        hopCount.setText(currentRouteEntry.getHop_count());
+        hopCount.setText(currentRoute.getHop_count());
 
         TextView sequence = (TextView) listItem.findViewById(R.id.av_sequence);
-        sequence.setText(currentRouteEntry.getSequence());
+        sequence.setText(currentRoute.getSequence());
 
         return listItem;
     }
