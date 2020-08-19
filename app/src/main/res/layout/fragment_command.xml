@@ -14,13 +14,15 @@
         android:orientation="horizontal">
         <Button
             android:id="@+id/openDeviceSecure"
-            android:text="Secure"
+            android:text="@string/secure"
+            android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="5"/>
         <Button
             android:id="@+id/openDeviceInsecure"
-            android:text="Insecure"
+            android:text="@string/insecure"
+            android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="5"/>
@@ -45,10 +47,16 @@
     </LinearLayout>
 
     <ListView
-            android:id="@+id/communicationView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
+        android:id="@+id/communicationView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <ListView
+        android:id="@+id/aodvView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
 
 
     <View

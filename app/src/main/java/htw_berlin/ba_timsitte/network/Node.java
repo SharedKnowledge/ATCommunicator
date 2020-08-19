@@ -29,18 +29,9 @@ public class Node implements Parcelable{
         }
     };
 
-    /**
-     *
-     */
-    public Node(String addr){
-        this.addr = addr;
-        this.is_active = true;
-        // 10 minutes time to live
-        timeToLive.start();
-    }
 
     /**
-     *
+     * @param addr
      * @param lat
      * @param lon
      */
