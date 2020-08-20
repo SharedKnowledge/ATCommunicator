@@ -12,6 +12,7 @@ public class AODVRREQ extends AODVMessage{
     private int destinationOnlyFlag;
     private int unknownSeqNrFlag;
     private int reserved;
+    private int timeToLive;
     private int hopCount;
     private int rreqId;
     private String destination;
@@ -21,7 +22,7 @@ public class AODVRREQ extends AODVMessage{
 
 
     public AODVRREQ(int joinFlag, int repairFlag, int gratuitousRREPFlag, int destinationOnlyFlag,
-                    int unknownSeqNrFlag, int reserved, int hopCount, int rreqId, String destination,
+                    int unknownSeqNrFlag, int reserved, int timeToLive, int hopCount, int rreqId, String destination,
                     int destSequenceNumber, String originator, int origSequenceNumber){
         super(1);
         this.joinFlag = joinFlag;
@@ -30,6 +31,7 @@ public class AODVRREQ extends AODVMessage{
         this.destinationOnlyFlag = destinationOnlyFlag;
         this.unknownSeqNrFlag = unknownSeqNrFlag;
         this.reserved = 0;
+        this.timeToLive = timeToLive;
         this.hopCount = hopCount;
         this.rreqId = rreqId;
         this.destination = destination;
@@ -48,6 +50,10 @@ public class AODVRREQ extends AODVMessage{
                 Integer.toString(unknownSeqNrFlag), Integer.toString(reserved), Integer.toString(hopCount),
                 Integer.toString(rreqId), destination, Integer.toString(destSequenceNumber),
                 originator, Integer.toString(origSequenceNumber));
+    }
+
+    public String toInfoString(){
+        return "RREQ dest: " +  destination + " orig: " +  originator + " hop: " + hopCount;
     }
 
     public int getJoinFlag() {
@@ -136,5 +142,13 @@ public class AODVRREQ extends AODVMessage{
 
     public void setOrigSequenceNumber(int origSequenceNumber) {
         this.origSequenceNumber = origSequenceNumber;
+    }
+
+    public int getTimeToLive() {
+        return timeToLive;
+    }
+
+    public void setTimeToLive(int timeToLive) {
+        this.timeToLive = timeToLive;
     }
 }

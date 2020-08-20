@@ -41,6 +41,10 @@ public class AODVRREP extends AODVMessage{
                 Integer.toString(lifetime));
     }
 
+    public String toInfoString(){
+        return "RREP dest: " + destination + " orig: "  + originator + " hop: " + hopCount;
+    }
+
     public int getRepairFlag() {
         return repairFlag;
     }

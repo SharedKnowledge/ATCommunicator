@@ -37,8 +37,10 @@ import htw_berlin.ba_timsitte.communication.Constants;
 import htw_berlin.ba_timsitte.network.AODVConstants;
 import htw_berlin.ba_timsitte.network.AODVMessage;
 import htw_berlin.ba_timsitte.network.AODVNetworkProtocol;
+import htw_berlin.ba_timsitte.network.AODVPacket;
 import htw_berlin.ba_timsitte.network.AODVRERR;
 import htw_berlin.ba_timsitte.network.AODVRREP;
+import htw_berlin.ba_timsitte.network.AODVRREP_ACK;
 import htw_berlin.ba_timsitte.network.AODVRREQ;
 
 public class CommandFragment extends Fragment {
@@ -192,7 +194,7 @@ public class CommandFragment extends Fragment {
     public void sendMessage() {
         String message = mOutEditText.getText().toString();
         String newString = "5|testOrig|testDesti|" + message;
-        mAODVNetworkProtocol.handleIncomingMessages("no one", newString);
+        mAODVNetworkProtocol.handleIncomingMessage("no one", newString);
         // Check that there's actually something to send
 //        if (message.length() > 0) {
 //            // Get the message bytes and tell the BluetoothChatService to write
@@ -208,18 +210,18 @@ public class CommandFragment extends Fragment {
     /**
      *
      */
-    private class SendAODVMessageThread extends Thread {
+    private class SendAODVMessage extends Thread {
         private String addr;
         private Boolean success = false;
         private int timeout1 = 5;
         private int timeout2 = 5;
 
-        public SendAODVMessageThread(AODVMessage msg){
+        public SendAODVMessage(AODVMessage msg, String nextAddr){
             if (msg instanceof AODVRREQ){
                 addr = "AT+ADDR=FFFF\r\n";
             }
             if (msg instanceof AODVRREP){
-                addr = String.format("AT+ADDR=%s\r\n", ((AODVRREP) msg).getDestination());
+                addr = String.format("AT+ADDR=%s\r\n", nextAddr);
             }
             if (msg instanceof AODVRERR){
                 addr = "AT+ADDR=FFFF\r\n";
@@ -227,8 +229,8 @@ public class CommandFragment extends Fragment {
             byte[] send = msg.toString().getBytes();
         }
 
-        @Override
-        public void run() {
+        public void startThread() {
+            Log.d(TAG, "BEGIN SendAODVMessage startThread");
             // AT+ADDR=\r\n
             while (timeout1>0 || success){
                 byte[] send = addr.getBytes();
@@ -240,6 +242,7 @@ public class CommandFragment extends Fragment {
                 timeout1 =-1;
 
                 }
+            Log.d(TAG, "END SendAODVMessage startThread");
             }
 
 
@@ -321,49 +324,39 @@ public class CommandFragment extends Fragment {
     @SuppressLint("HandlerLeak")
     private final Handler aodvHandler = new Handler() {
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void handleMessage(Message msg) {
             FragmentActivity activity = getActivity();
             switch (msg.what) {
-                case AODVConstants.AODV_RREQ_SEND:
-                    Log.i(TAG, "handleMessage: Send AODV RREQ");
-                    String rreqSend = (String) msg.obj;
-                    mAODVArrayAdapter.add("RREQ: " + rreqSend);
+                case AODVConstants.AODV_RREQ:
+                    Log.i(TAG, "handleMessage: AODV RREQ");
+                    AODVRREQ aodvrreq = (AODVRREQ) msg.obj;
+                    // SendAODVMessage aodvMessageThread = new SendAODVMessage(aodvrreq, "FFFF");
+                    // aodvMessageThread.startThread();
+                    mAODVArrayAdapter.add(aodvrreq.toInfoString() + " SENT");
                     break;
-                case AODVConstants.AODV_RREP_SEND:
-                    Log.i(TAG, "handleMessage: Send AODV RREP");
-                    String rrepSend = (String) msg.obj;
-                    mAODVArrayAdapter.add(rrepSend);
+                case AODVConstants.AODV_RREP:
+                    Log.i(TAG, "handleMessage: AODV RREP");
+                    AODVRREP aodvrrep = (AODVRREP) msg.obj;
+                    mAODVArrayAdapter.add(aodvrrep.toInfoString() + " SENT");
                     break;
-                case AODVConstants.AODV_RERR_SEND:
-                    Log.i(TAG, "handleMessage: Send AODV RERR");
-                    String rerrSend = (String) msg.obj;
-                    mAODVArrayAdapter.add(rerrSend);
+                case AODVConstants.AODV_RERR:
+                    Log.i(TAG, "handleMessage: AODV RERR");
+                    AODVRERR aodvrerr = (AODVRERR) msg.obj;
+                    mAODVArrayAdapter.add("RERR " + aodvrerr.toInfoString() + " SENT");
                     break;
-                case AODVConstants.AODV_RERR_ACK_SEND:
-                    Log.i(TAG, "handleMessage: Send AODV RERR_ACK");
-                    String rerrackSend = (String) msg.obj;
-                    mAODVArrayAdapter.add(rerrackSend);
+                case AODVConstants.AODV_RERR_ACK:
+                    Log.i(TAG, "handleMessage: AODV RERR_ACK");
+                    AODVRREP_ACK aodvrrep_ack = (AODVRREP_ACK) msg.obj;
+                    mAODVArrayAdapter.add("RERR_ACK " + aodvrrep_ack.toInfoString() + " SENT");
                     break;
-                case AODVConstants.IP_PACKET_SEND:
-                    Log.i(TAG, "handleMessage: Send IP PACKET");
-                    String ipPacketSend = (String) msg.obj;
-                    mAODVArrayAdapter.add(ipPacketSend);
+                case AODVConstants.AODV_PACKET:
+                    Log.i(TAG, "handleMessage: IP PACKET");
+                    AODVPacket aodvPacket = (AODVPacket) msg.obj;
+                    mAODVArrayAdapter.add("PACKET " + aodvPacket.toString() + " SENT");
                     break;
-                case AODVConstants.AODV_RREQ_RECEIVED:
-                    Log.i(TAG, "handleMessage: Recived AODV RREQ");
-                    break;
-                case AODVConstants.AODV_RREP_RECEIVED:
-                    Log.i(TAG, "handleMessage: Received AODV RREP");
-                    break;
-                case AODVConstants.AODV_RERR_RECEIVED:
-                    Log.i(TAG, "handleMessage: Received AODV RERR");
-                    break;
-                case AODVConstants.AODV_RERR_ACK_RECEIVED:
-                    Log.i(TAG, "handleMessage: Received AODV RERR_ACK");
-                    break;
-                case AODVConstants.IP_PACKET_RECEIVED:
-                    Log.i(TAG, "handleMessage: Received IP PACKET");
+                case AODVConstants.AODV_INFO:
                     break;
             }
         }

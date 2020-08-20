@@ -3,20 +3,14 @@ package htw_berlin.ba_timsitte.network;
 public interface AODVConstants {
 
     // Message types
-    public static final int AODV_RREQ_SEND = 1;
-    public static final int AODV_RREP_SEND = 2;
-    public static final int AODV_RERR_SEND = 3;
-    public static final int AODV_RERR_ACK_SEND = 4;
-    public static final int IP_PACKET_SEND = 5;
-    public static final int AODV_RREQ_RECEIVED = 6;
-    public static final int AODV_RREP_RECEIVED = 7;
-    public static final int AODV_RERR_RECEIVED = 8;
-    public static final int AODV_RERR_ACK_RECEIVED = 9;
-    public static final int IP_PACKET_RECEIVED = 10;
+    public static final int AODV_RREQ = 1;
+    public static final int AODV_RREP = 2;
+    public static final int AODV_RERR = 3;
+    public static final int AODV_RERR_ACK = 4;
+    public static final int AODV_PACKET = 5;
+    public static final int AODV_INFO = 6; // Information output for protocol events
 
     // Key names
-    public static final String NEXT = "NEXT";
-    public static final String MESSAGE = "MESSAGE";
-    public static final String ORIGINATOR = "ORIGINATOR";
-    public static final String DESTINATION = "DESTINATION";
+    public static final String MESSAGE_BODY = "MESSAGE_BODY"; // the body which needs to be send with AT
+    public static final String NEXT_ADDR = "NEXT_ADDR";
 }

@@ -31,6 +31,10 @@ public class AODVRERR extends AODVMessage{
                 Integer.toString(unreachableDestSequenceNumber));
     }
 
+    public String toInfoString(){
+        return "RERR unreachDest: " + unreachableDestination;
+    }
+
     public int getNoDeleteFlag() {
         return noDeleteFlag;
     }

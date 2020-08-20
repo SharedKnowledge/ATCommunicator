@@ -1,6 +1,7 @@
 package htw_berlin.ba_timsitte.network;
 
 import android.os.CountDownTimer;
+import androidx.annotation.NonNull;
 
 public class Route {
 
@@ -9,7 +10,8 @@ public class Route {
     private String next;
     private int hop_count;
     private boolean is_active;
-    private CountDownTimer timeToLive  = new CountDownTimer(600000, 0) {
+    private int lifetime;
+    private CountDownTimer timeToLive  = new CountDownTimer(lifetime, 0) {
         @Override
         public void onTick(long l) {
         }
@@ -23,13 +25,20 @@ public class Route {
     /*
 
      */
-    public Route(String destinationDevice, String nextDevice, int sequence, int hop_count){
-        this.destination = destinationDevice;
-        this.next = nextDevice;
+    public Route(String destination, String next, int sequence, int hop_count, int lifetime){
+        this.destination = destination;
+        this.next = next;
         this.destSequenceNumber = sequence;
         this.hop_count = hop_count;
+        this.lifetime = lifetime;
         this.is_active = true;
         this.timeToLive.start();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "ROUTE dest: " +  destination + " next: " + next + " hop: " + hop_count;
     }
 
     public int getSequence() {

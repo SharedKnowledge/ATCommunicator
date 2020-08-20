@@ -20,4 +20,8 @@ public class AODVRREP_ACK extends AODVMessage {
     public String toString() {
         return String.join("|", Integer.toString(super.getType()), Integer.toString(reserved));
     }
+
+    public String toInfoString(){
+        return "RREP_ACK";
+    }
 }
