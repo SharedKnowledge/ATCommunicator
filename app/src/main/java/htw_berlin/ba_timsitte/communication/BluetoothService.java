@@ -23,11 +23,11 @@ import java.util.UUID;
  */
 public class BluetoothService {
     // Debugging
-    private static final String TAG = "BluetoothChatService";
+    private static final String TAG = "BluetoothService";
 
     // Name for the SDP record when creating server socket
-    private static final String NAME_SECURE = "BluetoothChatSecure";
-    private static final String NAME_INSECURE = "BluetoothChatInsecure";
+    private static final String NAME_SECURE = "BluetoothSecure";
+    private static final String NAME_INSECURE = "BluetoothInsecure";
 
     // Unique UUID for this application
     private static final UUID MY_UUID_SECURE =
@@ -52,7 +52,7 @@ public class BluetoothService {
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
     /**
-     * Constructor. Prepares a new BluetoothChat session.
+     * Constructor. Prepares a new Bluetooth session.
      *
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
@@ -65,7 +65,7 @@ public class BluetoothService {
     }
 
     /**
-     * Update UI title according to the current state of the chat connection
+     * Update UI title according to the current state of the communication connection
      */
     private synchronized void updateUserInterfaceTitle() {
         mState = getState();
@@ -84,7 +84,7 @@ public class BluetoothService {
     }
 
     /**
-     * Start the chat service. Specifically start AcceptThread to begin a
+     * Start the communication service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {

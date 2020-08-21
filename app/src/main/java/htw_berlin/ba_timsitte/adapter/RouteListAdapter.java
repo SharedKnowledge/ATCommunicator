@@ -1,4 +1,4 @@
-package htw_berlin.ba_timsitte.network;
+package htw_berlin.ba_timsitte.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import htw_berlin.ba_timsitte.R;
+import htw_berlin.ba_timsitte.network.Route;
 
 public class RouteListAdapter extends ArrayAdapter<Route> {
     private Context mContext;

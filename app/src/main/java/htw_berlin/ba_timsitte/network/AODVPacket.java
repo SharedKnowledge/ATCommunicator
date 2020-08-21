@@ -24,6 +24,10 @@ public class AODVPacket extends AODVMessage {
         return String.join("|", Integer.toString(super.getType()), originator, destination, body);
     }
 
+    public String toInfoString(){
+        return "PACKET orig: " + originator + " dest:" + destination + " msg:" + body;
+    }
+
     public String getOriginator() {
         return originator;
     }

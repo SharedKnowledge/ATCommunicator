@@ -9,6 +9,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CommandFragment mCommandFragment;
     private MapFragment mMapFragment;
     private SettingsFragment mSettingsFragment;
-//    private OverviewFragment mOverviewFragment;
+    private AODVFragment mAODVFragment;
 
 
     @Override
@@ -110,6 +112,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 loadFragment(mSettingsFragment);
                 drawerLayout.closeDrawers();
                 break;
+            case R.id.nav_aodv:
+                loadFragment(mAODVFragment);
+                drawerLayout.closeDrawers();
+                break;
+            case R.id.nav_info:
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Info");
+                alertDialog.setIcon(R.drawable.ic_info);
+                alertDialog.setMessage("This app was build by Tim Sitte.\n\nBachelor Thesis:\n" +
+                        "Implementierung von AODV unter Android für ein schmalbandiges drahtloses Netzwerk");
+
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+                drawerLayout.closeDrawers();
+                break;
         }
         return true;
     }
@@ -120,37 +142,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mCommandFragment = new CommandFragment();
         mMapFragment = new MapFragment();
         mSettingsFragment = new SettingsFragment();
-//        mOverviewFragment = new OverviewFragment();
+        mAODVFragment = new AODVFragment();
     }
 
     public void initiateFirstFragment(){
         // In case this activity was started with special instructions from an Intent,
         // pass the Intent's extras to the fragment as arguments
         mCommandFragment.setArguments(getIntent().getExtras());
-//        mOverviewFragment.setArguments(getIntent().getExtras());
         // Add the fragment to the 'fragment_container' FrameLayout
         getSupportFragmentManager()
                 .beginTransaction()
+                .add(R.id.fragment_container, mSettingsFragment)
+                .add(R.id.fragment_container, mMapFragment)
+                .add(R.id.fragment_container, mAODVFragment)
                 .add(R.id.fragment_container, mCommandFragment)
                 .commit();
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .add(R.id.fragment_overview, mOverviewFragment)
-//                .commit();
     }
 
     public void loadFragment(Fragment fragment) {
-        if (fragment != null){
+        if (fragment instanceof CommandFragment){
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
+                    .hide(mSettingsFragment)
+                    .hide(mAODVFragment)
+                    .hide(mMapFragment)
+                    .show(fragment)
                     .commit();
-            Log.d(TAG, "loadFragment: " + fragment.toString());
         }
-    }
-
-    public CommandFragment getCommandFragment() {
-        return mCommandFragment;
+        if (fragment instanceof AODVFragment) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction
+                    .hide(mSettingsFragment)
+                    .hide(mCommandFragment)
+                    .hide(mMapFragment)
+                    .show(fragment)
+                    .commit();
+        }
+        if (fragment instanceof MapFragment) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction
+                    .hide(mSettingsFragment)
+                    .hide(mAODVFragment)
+                    .hide(mCommandFragment)
+                    .show(fragment)
+                    .commit();
+        }
+        if (fragment instanceof SettingsFragment) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction
+                    .hide(mCommandFragment)
+                    .hide(mAODVFragment)
+                    .hide(mMapFragment)
+                    .show(fragment)
+                    .commit();
+        }
+        Log.d(TAG, "loadFragment: " + fragment.toString());
     }
 }

@@ -1,4 +1,4 @@
-package htw_berlin.ba_timsitte.communication;
+package htw_berlin.ba_timsitte.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

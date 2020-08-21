@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import htw_berlin.ba_timsitte.R;
-import htw_berlin.ba_timsitte.network.MapDeviceListAdapter;
+import htw_berlin.ba_timsitte.adapter.MapDeviceListAdapter;
 import htw_berlin.ba_timsitte.network.Node;
 import htw_berlin.ba_timsitte.network.Route;
 

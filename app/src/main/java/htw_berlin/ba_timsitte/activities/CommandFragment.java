@@ -2,11 +2,14 @@ package htw_berlin.ba_timsitte.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -17,6 +20,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +31,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,9 +60,15 @@ public class CommandFragment extends Fragment {
     @BindView(R.id.aodvView) ListView mAODVView;
     @BindView(R.id.openDeviceSecure) Button btnOpenDeviceSecure;
     @BindView(R.id.openDeviceInsecure) Button btnOpenDeviceInsecure;
+    @BindView(R.id.sendTo) EditText mSendToEditText;
+    @BindView(R.id.btnAODV) Button btnAODV;
+    @BindView(R.id.nodeName) TextView nodeNameTextView;
 
     private BluetoothService mBluetoothService = null;
     private AODVNetworkProtocol mAODVNetworkProtocol = null;
+
+    private boolean isAODVActive = false;
+    private String nodeName = "";
 
     // Intent request codes
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
@@ -64,30 +76,38 @@ public class CommandFragment extends Fragment {
     private static final int REQUEST_ENABLE_BT = 3;
 
     // Socket status
-    public static final int AT_STATE_NONE = 0;       // we're doing nothing
-    public static final int AT_STATE_LISTEN = 1;     // now listening for incoming messages
-    public static final int AT_STATE_BUSY = 2;       // performing
-    public static final int AT_STATE_WRITING = 3;    // writing/sending
+    private static final int AT_STATE_NONE = 0;       // we're doing nothing
+    private static final int AT_STATE_LISTEN = 1;     // now listening for incoming messages
+    private static final int AT_STATE_BUSY = 2;       // performing
+    private static final int AT_STATE_WRITING = 3;    // writing/sending
 
-    // name of the connected bluetooth device
+    // Name of the connected bluetooth device
     private String mConnectedDeviceName = null;
 
-    /**
-     * Array adapter for the conversation thread
-     */
+    // Array adapter for the conversation thread
     private ArrayAdapter<String> mCommunicationArrayAdapter;
     private ArrayAdapter<String> mAODVArrayAdapter;
 
-    /**
-     * String buffer for outgoing messages
-     */
+    // String buffer for outgoing messages
     private StringBuffer mOutStringBuffer;
 
     private BluetoothAdapter mBluetoothAdapter = null;
 
+    // BroadcastReceiver related
+    private Context _context;
+    private BroadcastReceiver aodvBroadcastReceiver;
+    private final String AODV_STATUS = "htw_berlin.ba_timsitte.AODV_STATUS";
+    private final String AODV_STATUS_EXTRA = "htw_berlin.ba_timsitte.AODV_STATUS";
+    // AODV status
+    private static final int AODV_ON = 1;
+    private static final int AODV_OFF = 0;
+
+    Calendar time = Calendar.getInstance();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // If the adapter is null, then Bluetooth is not supported
         FragmentActivity activity = getActivity();
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -103,7 +123,14 @@ public class CommandFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_command, container, false);
         ButterKnife.bind(this, view);
+        setUpAODVBr();
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        _context = context;
     }
 
     @Override
@@ -112,23 +139,20 @@ public class CommandFragment extends Fragment {
         if (mBluetoothAdapter == null) {
             return;
         }
-        // If BT is not on, request that it be enabled.
+        // If BT is not on, request that it will be enabled.
         // setupCommunication() will then be called during onActivityResult
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-            // Otherwise, setup the chat session
+            // Otherwise, set up the communication
         } else if (mBluetoothService == null) {
             initiateCommunication();
         }
 
         FragmentActivity activity = getActivity();
-        // aodv terminal
+        // AODV terminal
         mAODVArrayAdapter= new ArrayAdapter<>(activity, R.layout.message);
         mAODVView.setAdapter(mAODVArrayAdapter);
-
-        // initiate aodv protocol
-        mAODVNetworkProtocol = new AODVNetworkProtocol("test", aodvHandler);
     }
 
     @Override
@@ -145,6 +169,13 @@ public class CommandFragment extends Fragment {
                 mBluetoothService.start();
             }
         }
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+        _context.unregisterReceiver(aodvBroadcastReceiver);
     }
 
     @Override
@@ -166,7 +197,7 @@ public class CommandFragment extends Fragment {
         if (activity == null) {
             return;
         }
-        // chat terminal
+        // Communication terminal
         mCommunicationArrayAdapter = new ArrayAdapter<>(activity, R.layout.message);
         mConversationView.setAdapter(mCommunicationArrayAdapter);
 
@@ -189,23 +220,83 @@ public class CommandFragment extends Fragment {
         }
     }
 
+    @OnClick(R.id.btnAODV)
+    public void toggleAODV(){
+        Log.d(TAG, "BEGIN toggleAODV");
+
+        FragmentActivity activity = getActivity();
+
+        // AODV is deactivated
+        if (!isAODVActive){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Name your node");
+
+            // Set up the input
+            final EditText input = new EditText(activity);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            input.setText(nodeName);
+            builder.setView(input);
+
+            // Set up the button
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    nodeName = input.getText().toString();
+                    Log.i(TAG, "toggleAODV onClick: new name " +  nodeName);
+                    if (nodeName.length() > 0){
+                        isAODVActive = true;
+                        Intent intent = new Intent(AODV_STATUS);
+                        intent.putExtra(AODV_STATUS_EXTRA, AODV_ON);
+                        _context.sendBroadcast(intent);
+                    }
+                }
+            });
+            builder.show();
+
+        // AODV is activated
+        } else {
+            isAODVActive = false;
+            Intent intent = new Intent(AODV_STATUS);
+            intent.putExtra(AODV_STATUS_EXTRA, AODV_OFF);
+            _context.sendBroadcast(intent);
+        }
+        Log.d(TAG, "END toggleAODV");
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @OnClick(R.id.btnSend)
     public void sendMessage() {
+        Log.d(TAG, "BEGIN sendMessage");
         String message = mOutEditText.getText().toString();
-        String newString = "5|testOrig|testDesti|" + message;
-        mAODVNetworkProtocol.handleIncomingMessage("no one", newString);
-        // Check that there's actually something to send
-//        if (message.length() > 0) {
-//            // Get the message bytes and tell the BluetoothChatService to write
-//            byte[] send = message.getBytes();
-//            mBluetoothService.write(send);
-//
-//            // Reset out string buffer to zero and clear the edit text field
-//            mOutStringBuffer.setLength(0);
-//            mOutEditText.setText(mOutStringBuffer);
-//        }
-    }
+        String sendTo = mSendToEditText.getText().toString();
+        if (isAODVActive){
+            // Check that there's actually something to send
+            if (message.length() > 0 && sendTo.length() > 0){
+                AODVPacket aodvPacket = new AODVPacket(mAODVNetworkProtocol.getOwnNodeName(), sendTo, message);
+                mAODVNetworkProtocol.handleIncomingMessage(aodvPacket.getOriginator(), aodvPacket.toString());
+            } else {
+                Toast.makeText(_context, "At least one text field is empty.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Check that there's actually something to send
+            if (message.length() > 0) {
+                // Get the message bytes and tell the BluetoothService to write
+                byte[] send = message.getBytes();
+                mBluetoothService.write(send);
+                mCommunicationArrayAdapter.add(message);
+            } else {
+                Toast.makeText(_context, "Text field is empty.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+        // Reset out string buffer to zero and clear the edit text fields
+        mOutStringBuffer.setLength(0);
+        mOutEditText.setText(mOutStringBuffer);
+        mSendToEditText.setText("");
+        Log.d(TAG, "END sendMessage");
+}
 
     /**
      *
@@ -215,33 +306,31 @@ public class CommandFragment extends Fragment {
         private Boolean success = false;
         private int timeout1 = 5;
         private int timeout2 = 5;
+        private AODVMessage msg;
 
         public SendAODVMessage(AODVMessage msg, String nextAddr){
+            // Broadcast messages
             if (msg instanceof AODVRREQ){
                 addr = "AT+ADDR=FFFF\r\n";
             }
-            if (msg instanceof AODVRREP){
+            // Unicast messages
+            if (msg instanceof AODVRREP ||
+                msg instanceof AODVRERR ||
+                msg instanceof AODVPacket){
                 addr = String.format("AT+ADDR=%s\r\n", nextAddr);
             }
-            if (msg instanceof AODVRERR){
-                addr = "AT+ADDR=FFFF\r\n";
+            if (msg instanceof AODVRREP_ACK){
+
             }
-            byte[] send = msg.toString().getBytes();
+
+            this.msg = msg;
         }
 
         public void startThread() {
             Log.d(TAG, "BEGIN SendAODVMessage startThread");
             // AT+ADDR=\r\n
-            while (timeout1>0 || success){
-                byte[] send = addr.getBytes();
-                mBluetoothService.write(send);
-                // mBluetoothService.
-                mAODVArrayAdapter.add(addr);
-                mAODVArrayAdapter.add("Waiting for response");
-
-                timeout1 =-1;
-
-                }
+            // mBluetoothService.write();
+            msg.toString();
             Log.d(TAG, "END SendAODVMessage startThread");
             }
 
@@ -332,29 +421,29 @@ public class CommandFragment extends Fragment {
                 case AODVConstants.AODV_RREQ:
                     Log.i(TAG, "handleMessage: AODV RREQ");
                     AODVRREQ aodvrreq = (AODVRREQ) msg.obj;
-                    // SendAODVMessage aodvMessageThread = new SendAODVMessage(aodvrreq, "FFFF");
-                    // aodvMessageThread.startThread();
-                    mAODVArrayAdapter.add(aodvrreq.toInfoString() + " SENT");
+                    SendAODVMessage aodvMessageThread = new SendAODVMessage(aodvrreq, "FFFF");
+                    aodvMessageThread.startThread();
+                    mAODVArrayAdapter.add(getCurrentTime() + aodvrreq.toInfoString() + " SENT");
                     break;
                 case AODVConstants.AODV_RREP:
                     Log.i(TAG, "handleMessage: AODV RREP");
                     AODVRREP aodvrrep = (AODVRREP) msg.obj;
-                    mAODVArrayAdapter.add(aodvrrep.toInfoString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() + aodvrrep.toInfoString() + " SENT");
                     break;
                 case AODVConstants.AODV_RERR:
                     Log.i(TAG, "handleMessage: AODV RERR");
                     AODVRERR aodvrerr = (AODVRERR) msg.obj;
-                    mAODVArrayAdapter.add("RERR " + aodvrerr.toInfoString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() +  aodvrerr.toInfoString() + " SENT");
                     break;
                 case AODVConstants.AODV_RERR_ACK:
                     Log.i(TAG, "handleMessage: AODV RERR_ACK");
                     AODVRREP_ACK aodvrrep_ack = (AODVRREP_ACK) msg.obj;
-                    mAODVArrayAdapter.add("RERR_ACK " + aodvrrep_ack.toInfoString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() +  aodvrrep_ack.toInfoString() + " SENT");
                     break;
                 case AODVConstants.AODV_PACKET:
                     Log.i(TAG, "handleMessage: IP PACKET");
                     AODVPacket aodvPacket = (AODVPacket) msg.obj;
-                    mAODVArrayAdapter.add("PACKET " + aodvPacket.toString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() + aodvPacket.toInfoString() + " SENT");
                     break;
                 case AODVConstants.AODV_INFO:
                     break;
@@ -379,7 +468,7 @@ public class CommandFragment extends Fragment {
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
-                    // Bluetooth is now enabled, so set up a chat session
+                    // Bluetooth is now enabled, so set up a communication session
                     initiateCommunication();
                 } else {
                     // User did not enable Bluetooth or an error occurred
@@ -424,6 +513,13 @@ public class CommandFragment extends Fragment {
         startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
     }
 
+    private String getCurrentTime(){
+        String hour = String.valueOf(time.get(Calendar.HOUR_OF_DAY));
+        String min = String.valueOf(time.get(Calendar.MINUTE));
+        String sec = String.valueOf(time.get(Calendar.SECOND));
+        return hour + ":" + min + ":" + sec + " ";
+    }
+
     // ----------------- BroadcastReceiver -----------------
 
     private final BroadcastReceiver mATBroadcastReceiver = new BroadcastReceiver() {
@@ -442,11 +538,46 @@ public class CommandFragment extends Fragment {
                         btnSend.setEnabled(false);
                         mOutEditText.setEnabled(false);
                         break;
-
                 }
             }
         }
     };
+
+    private void setUpAODVBr(){
+        Log.d(TAG, "BEGIN setUpAODVBr");
+        aodvBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "BEGIN aodvBroadcastReceiver onReceive");
+                if (AODV_STATUS.equals(intent.getAction())) {
+                    int state = intent.getIntExtra(AODV_STATUS_EXTRA, 0);
+                    switch (state) {
+                        case AODV_ON:
+                            Log.i(TAG, "aodvBroadcastReceiver onReceive: AODV ON");
+                            Toast.makeText(context, "AODV turned on.",
+                                    Toast.LENGTH_SHORT).show();
+                            btnAODV.setText("Deactivate AODV");
+                            mSendToEditText.setEnabled(true);
+                            nodeNameTextView.setText("Name " + nodeName);
+                            mAODVNetworkProtocol = new AODVNetworkProtocol(nodeName, aodvHandler);
+                            break;
+                        case AODV_OFF:
+                            Log.i(TAG, "aodvBroadcastReceiver onReceive: AODV OFF");
+                            Toast.makeText(context, "AODV turned off.",
+                                    Toast.LENGTH_SHORT).show();
+                            btnAODV.setText("Activate AODV");
+                            nodeNameTextView.setText("Name ");
+                            mSendToEditText.setEnabled(false);
+                            break;
+                    }
+                }
+                Log.d(TAG, "END aodvBroadcastReceiver onReceive");
+            }
+        };
+        _context.registerReceiver(aodvBroadcastReceiver, new IntentFilter(AODV_STATUS));
+        Log.d(TAG, "END setUpAODVBr");
+    }
+
 
     // ----------------- Getter/Setter -----------------
 

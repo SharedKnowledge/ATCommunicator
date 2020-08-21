@@ -416,7 +416,7 @@ public class  AODVNetworkProtocol {
      * Class for receiving RREPs
      */
     private class RREPReceiver extends Thread {
-        private AODVRREP aodvrrep = null;
+        private AODVRREP aodvrrep;
         private String receivedFrom;
 
         RREPReceiver(AODVRREP aodvrrep, String receivedFrom){

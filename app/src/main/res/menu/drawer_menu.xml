@@ -7,6 +7,11 @@
             android:icon="@mipmap/ic_command">
         </item>
         <item
+            android:id="@+id/nav_aodv"
+            android:title="AODV Info"
+            android:icon="@mipmap/ic_aodv">
+        </item>
+        <item
             android:id="@+id/nav_map"
             android:title="Map"
             android:icon="@mipmap/ic_map">

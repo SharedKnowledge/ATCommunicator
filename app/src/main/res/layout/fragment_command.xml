@@ -13,6 +13,13 @@
         android:layout_height="35dp"
         android:orientation="horizontal">
         <Button
+            android:id="@+id/btnAODV"
+            android:text="Activate AODV"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="5"/>
+        <Button
             android:id="@+id/openDeviceSecure"
             android:text="@string/secure"
             android:textSize="12sp"
@@ -32,9 +39,10 @@
         android:layout_height="20dp"
         android:orientation="horizontal">
         <TextView
+            android:id="@+id/nodeName"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Event History"
+            android:text="Name: "
             android:textColor="@color/colorText"
             android:layout_weight="5"/>
         <TextView
@@ -69,12 +77,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+        <EditText
+            android:id="@+id/sendTo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:hint="Send to"
+            android:textColor="@color/colorText"
+            android:layout_weight="2"/>
 
         <EditText
             android:id="@+id/sendCommand"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text=""
+            android:hint="Message"
             android:textColor="@color/colorText"
             android:layout_weight="5"/>
 
