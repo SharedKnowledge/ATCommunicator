@@ -157,6 +157,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .add(R.id.fragment_container, mAODVFragment)
                 .add(R.id.fragment_container, mCommandFragment)
                 .commit();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction
+                .hide(mSettingsFragment)
+                .hide(mAODVFragment)
+                .hide(mMapFragment)
+                .commit();
     }
 
     public void loadFragment(Fragment fragment) {

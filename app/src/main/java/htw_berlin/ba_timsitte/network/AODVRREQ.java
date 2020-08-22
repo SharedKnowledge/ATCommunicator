@@ -1,5 +1,6 @@
 package htw_berlin.ba_timsitte.network;
 
+import android.content.Intent;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -47,8 +48,8 @@ public class AODVRREQ extends AODVMessage{
     public String toString() {
         return String.join("|", Integer.toString(super.getType()), Integer.toString(joinFlag),
                 Integer.toString(repairFlag), Integer.toString(gratuitousRREPFlag), Integer.toString(destinationOnlyFlag),
-                Integer.toString(unknownSeqNrFlag), Integer.toString(reserved), Integer.toString(hopCount),
-                Integer.toString(rreqId), destination, Integer.toString(destSequenceNumber),
+                Integer.toString(unknownSeqNrFlag), Integer.toString(reserved), Integer.toString(timeToLive),
+                Integer.toString(hopCount), Integer.toString(rreqId), destination, Integer.toString(destSequenceNumber),
                 originator, Integer.toString(origSequenceNumber));
     }
 

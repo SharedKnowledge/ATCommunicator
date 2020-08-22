@@ -32,7 +32,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +43,7 @@ import htw_berlin.ba_timsitte.R;
 import htw_berlin.ba_timsitte.communication.BluetoothService;
 import htw_berlin.ba_timsitte.communication.Constants;
 import htw_berlin.ba_timsitte.network.AODVConstants;
+import htw_berlin.ba_timsitte.network.AODVHello;
 import htw_berlin.ba_timsitte.network.AODVMessage;
 import htw_berlin.ba_timsitte.network.AODVNetworkProtocol;
 import htw_berlin.ba_timsitte.network.AODVPacket;
@@ -68,7 +71,7 @@ public class CommandFragment extends Fragment {
     private AODVNetworkProtocol mAODVNetworkProtocol = null;
 
     private boolean isAODVActive = false;
-    private String nodeName = "";
+    private String nodeName;
 
     // Intent request codes
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
@@ -245,7 +248,6 @@ public class CommandFragment extends Fragment {
                     nodeName = input.getText().toString();
                     Log.i(TAG, "toggleAODV onClick: new name " +  nodeName);
                     if (nodeName.length() > 0){
-                        isAODVActive = true;
                         Intent intent = new Intent(AODV_STATUS);
                         intent.putExtra(AODV_STATUS_EXTRA, AODV_ON);
                         _context.sendBroadcast(intent);
@@ -256,7 +258,6 @@ public class CommandFragment extends Fragment {
 
         // AODV is activated
         } else {
-            isAODVActive = false;
             Intent intent = new Intent(AODV_STATUS);
             intent.putExtra(AODV_STATUS_EXTRA, AODV_OFF);
             _context.sendBroadcast(intent);
@@ -274,7 +275,9 @@ public class CommandFragment extends Fragment {
             // Check that there's actually something to send
             if (message.length() > 0 && sendTo.length() > 0){
                 AODVPacket aodvPacket = new AODVPacket(mAODVNetworkProtocol.getOwnNodeName(), sendTo, message);
-                mAODVNetworkProtocol.handleIncomingMessage(aodvPacket.getOriginator(), aodvPacket.toString());
+                Log.d(TAG, "sendMessage: aodvPacket " + aodvPacket.toString());
+                mAODVNetworkProtocol.handleIncomingMessage(aodvPacket.getOriginator(),
+                        String.join("|", "5", mAODVNetworkProtocol.getOwnNodeName(), sendTo, message));
             } else {
                 Toast.makeText(_context, "At least one text field is empty.",
                         Toast.LENGTH_SHORT).show();
@@ -285,7 +288,7 @@ public class CommandFragment extends Fragment {
                 // Get the message bytes and tell the BluetoothService to write
                 byte[] send = message.getBytes();
                 mBluetoothService.write(send);
-                mCommunicationArrayAdapter.add(message);
+                mCommunicationArrayAdapter.add(getCurrentTime() + message);
             } else {
                 Toast.makeText(_context, "Text field is empty.",
                         Toast.LENGTH_SHORT).show();
@@ -310,7 +313,8 @@ public class CommandFragment extends Fragment {
 
         public SendAODVMessage(AODVMessage msg, String nextAddr){
             // Broadcast messages
-            if (msg instanceof AODVRREQ){
+            if (msg instanceof AODVRREQ ||
+                msg instanceof AODVHello){
                 addr = "AT+ADDR=FFFF\r\n";
             }
             // Unicast messages
@@ -330,7 +334,7 @@ public class CommandFragment extends Fragment {
             Log.d(TAG, "BEGIN SendAODVMessage startThread");
             // AT+ADDR=\r\n
             // mBluetoothService.write();
-            msg.toString();
+            //msg.toString();
             Log.d(TAG, "END SendAODVMessage startThread");
             }
 
@@ -355,6 +359,7 @@ public class CommandFragment extends Fragment {
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void handleMessage(Message msg) {
             FragmentActivity activity = getActivity();
@@ -376,21 +381,22 @@ public class CommandFragment extends Fragment {
                     break;
                 case Constants.MESSAGE_WRITE:
                     byte[] writeBuf = (byte[]) msg.obj;
-                    // construct a string from the buffer
+                    // Construct a string from the buffer
                     String writeMessage = new String(writeBuf);
-                    mCommunicationArrayAdapter.add("Me:  " + writeMessage);
+                    mCommunicationArrayAdapter.add(getCurrentTime() + "Me:  " + writeMessage);
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
-                    // construct a string from the valid bytes in the buffer
+                    // Construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     if (readMessage.startsWith("AODV|")){
-                        // aodv action here
+                        String aodvMessage = readMessage.substring(6);
+                        mAODVNetworkProtocol.handleIncomingMessage("unknown", aodvMessage);
                     }
-                    mCommunicationArrayAdapter.add(readMessage);
+                    mCommunicationArrayAdapter.add(getCurrentTime() + readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
-                    // save the connected device's name
+                    // Save the connected device's name
                     mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
                     if (null != activity) {
                         Toast.makeText(activity, "Connected to "
@@ -423,27 +429,32 @@ public class CommandFragment extends Fragment {
                     AODVRREQ aodvrreq = (AODVRREQ) msg.obj;
                     SendAODVMessage aodvMessageThread = new SendAODVMessage(aodvrreq, "FFFF");
                     aodvMessageThread.startThread();
-                    mAODVArrayAdapter.add(getCurrentTime() + aodvrreq.toInfoString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() + aodvrreq.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_RREP:
                     Log.i(TAG, "handleMessage: AODV RREP");
                     AODVRREP aodvrrep = (AODVRREP) msg.obj;
-                    mAODVArrayAdapter.add(getCurrentTime() + aodvrrep.toInfoString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() + aodvrrep.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_RERR:
                     Log.i(TAG, "handleMessage: AODV RERR");
                     AODVRERR aodvrerr = (AODVRERR) msg.obj;
-                    mAODVArrayAdapter.add(getCurrentTime() +  aodvrerr.toInfoString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() +  aodvrerr.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_RERR_ACK:
                     Log.i(TAG, "handleMessage: AODV RERR_ACK");
                     AODVRREP_ACK aodvrrep_ack = (AODVRREP_ACK) msg.obj;
-                    mAODVArrayAdapter.add(getCurrentTime() +  aodvrrep_ack.toInfoString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() +  aodvrrep_ack.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_PACKET:
                     Log.i(TAG, "handleMessage: IP PACKET");
                     AODVPacket aodvPacket = (AODVPacket) msg.obj;
-                    mAODVArrayAdapter.add(getCurrentTime() + aodvPacket.toInfoString() + " SENT");
+                    mAODVArrayAdapter.add(getCurrentTime() + aodvPacket.toInfoString() + " CREATED");
+                    break;
+                case AODVConstants.AODV_HELLO:
+                    Log.i(TAG, "handleMessage: AODV HELLO");
+                    AODVHello aodvHello = (AODVHello) msg.obj;
+                    mAODVArrayAdapter.add(getCurrentTime() + aodvHello.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_INFO:
                     break;
@@ -514,10 +525,9 @@ public class CommandFragment extends Fragment {
     }
 
     private String getCurrentTime(){
-        String hour = String.valueOf(time.get(Calendar.HOUR_OF_DAY));
-        String min = String.valueOf(time.get(Calendar.MINUTE));
-        String sec = String.valueOf(time.get(Calendar.SECOND));
-        return hour + ":" + min + ":" + sec + " ";
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss.SSS");
+        String out = simpleDateFormat.format(new Date());
+        return out + " ";
     }
 
     // ----------------- BroadcastReceiver -----------------
@@ -560,6 +570,7 @@ public class CommandFragment extends Fragment {
                             mSendToEditText.setEnabled(true);
                             nodeNameTextView.setText("Name " + nodeName);
                             mAODVNetworkProtocol = new AODVNetworkProtocol(nodeName, aodvHandler);
+                            isAODVActive = true;
                             break;
                         case AODV_OFF:
                             Log.i(TAG, "aodvBroadcastReceiver onReceive: AODV OFF");
@@ -568,6 +579,7 @@ public class CommandFragment extends Fragment {
                             btnAODV.setText("Activate AODV");
                             nodeNameTextView.setText("Name ");
                             mSendToEditText.setEnabled(false);
+                            isAODVActive = false;
                             break;
                     }
                 }

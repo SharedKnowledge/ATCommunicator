@@ -10,7 +10,7 @@ public class AODVRREQTest {
     @Test
     public void testValidAODVRREQ(){
         AODVRREQ rerr = new AODVRREQ(0, 0, 0, 0,
-                0, 0, 1, 12, "destTest", 12, "origTest", 13);
-        assertEquals("1|0|0|0|0|0|0|1|12|destTest|12|origTest|13", rerr.toString());
+                0, 0, 3, 1, 12, "destTest", 12, "origTest", 13);
+        assertEquals("1|0|0|0|0|0|0|3|1|12|destTest|12|origTest|13", rerr.toString());
     }
 }

@@ -22,20 +22,41 @@ public class  AODVNetworkProtocol {
     private AtomicInteger sequence_number = new AtomicInteger(0);
 
     // Amount of time in milliseconds a route is marked as active in the routing
-    private final int ROUTELIFETIME = 60000;
+    private final int ROUTE_LIFETIME = 600000; // 10 minutes
 
     // Amount of hops until an RREQ is discarded
-    private final int RREQLIFETIME = 3; //
+    private final int RREQ_LIFETIME = 3;
+
+    // Amount of time between Broadcast / Hello messages
+    private final int BROADCAST_INTERVAL = 300000; // 5 minutes
 
     private String ownNodeName;
     private final Handler mHandler;
     private final Handler rrepHandler; // to handle incoming RREPs
+    private final Handler helloHandler; // handle outgoing Hellos
+
+    // Runnable for broadcasting hello messages
+    private Runnable mHelloRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "mHelloRunnable: Broadcasting Hellos");
+            AODVHello aodvHello = new AODVHello(ownNodeName);
+            Message msg = mHandler.obtainMessage(AODVConstants.AODV_HELLO);
+            msg.obj = aodvHello;
+            mHandler.sendMessage(msg);
+            helloHandler.postDelayed(this, BROADCAST_INTERVAL);
+        }
+    };
 
     public AODVNetworkProtocol(String name, Handler handler) {
         this.ownNodeName = name;
         mHandler = handler;
         rrepHandler = new Handler();
+        helloHandler = new Handler();
+        mHelloRunnable.run();
     }
+
+
 
     /**
      * Convert string to the corresponding aodv message and task
@@ -44,7 +65,7 @@ public class  AODVNetworkProtocol {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void handleIncomingMessage(String receivedFrom, String s){
         try {
-            String[] output = s.split("|");
+            String[] output = s.split("\\|");
                 switch (output[0]){
                     case "1":
                         AODVRREQ rreq = new AODVRREQ(Integer.parseInt(output[1]), Integer.parseInt(output[2]),
@@ -52,7 +73,7 @@ public class  AODVNetworkProtocol {
                                 Integer.parseInt(output[6]), Integer.parseInt(output[7]), Integer.parseInt(output[8]),
                                 Integer.parseInt(output[9]), output[10], Integer.parseInt(output[11]),
                                 output[12], Integer.parseInt(output[13]));
-                        Log.d(TAG, "handleIncomingMessage: RREQ detected.");
+                        Log.d(TAG, "handleIncomingMessage: RREQ from " + receivedFrom + " detected. " + rreq.toString());
                         RREQReceiver rreqReceiver = new RREQReceiver(rreq, receivedFrom);
                         rreqReceiver.startThread();
                         break;
@@ -60,25 +81,31 @@ public class  AODVNetworkProtocol {
                         AODVRREP rrep = new AODVRREP(Integer.parseInt(output[1]), Integer.parseInt(output[2]),
                                 Integer.parseInt(output[3]), Integer.parseInt(output[4]), Integer.parseInt(output[5]),
                                 output[6], Integer.parseInt(output[7]), output[8], Integer.parseInt(output[9]));
-                        Log.d(TAG, "handleIncomingMessage: RREO detected.");
+                        Log.d(TAG, "handleIncomingMessage: RREO from " + receivedFrom + " detected. " + rrep.toString());
                         RREPReceiver rrepReceiver = new RREPReceiver(rrep,receivedFrom);
                         rrepReceiver.startThread();
                         break;
                     case "3":
-                        AODVRERR rrer = new AODVRERR(Integer.parseInt(output[1]), Integer.parseInt(output[2]),
+                        AODVRERR rerr = new AODVRERR(Integer.parseInt(output[1]), Integer.parseInt(output[2]),
                                 Integer.parseInt(output[3]), output[4], Integer.parseInt(output[5]));
-                        Log.d(TAG, "handleIncomingMessage: RRER detected.");
-                        RERRReceiver RERRReceiver = new RERRReceiver(rrer);
-                        RERRReceiver.startThread();
+                        Log.d(TAG, "handleIncomingMessage: RRER from " + receivedFrom + " detected. " + rerr.toString());
+                        RERRReceiver rerrReceiver = new RERRReceiver(rerr);
+                        rerrReceiver.startThread();
                         break;
                     case "4":
-                        AODVRREP_ACK rrep_ack = new AODVRREP_ACK(Integer.parseInt(output[3]));
-                        Log.d(TAG, "handleIncomingMessage: RREP-ACK detected.");
+                        AODVRREP_ACK rrep_ack = new AODVRREP_ACK(Integer.parseInt(output[1]));
+                        Log.d(TAG, "handleIncomingMessage: RREP-ACK from " + receivedFrom + " detected. " + rrep_ack.toString());
                         break;
                     case "5":
                         AODVPacket aodvPacket = new AODVPacket(output[1], output[2], output[3]);
-                        Log.d(TAG, "handleIncomingMessage: AODV Packet detected.");
+                        Log.d(TAG, "handleIncomingMessage: AODV Packet from " + receivedFrom + " detected. " + aodvPacket.toString());
                         routeNeeded(aodvPacket);
+                        break;
+                    case "6":
+                        AODVHello aodvHello = new AODVHello(output[1]);
+                        Log.d(TAG, "handleIncomingMessage: AODV Hello from " + receivedFrom + " detected. " + aodvHello.toString());
+                        HelloReceiver helloReceiver = new HelloReceiver(aodvHello, receivedFrom);
+                        helloReceiver.startThread();
                         break;
                     default:
                         Log.d(TAG, "handleIncomingMessage: No AODV message type detected.");
@@ -98,13 +125,14 @@ public class  AODVNetworkProtocol {
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void routeNeeded(AODVPacket aodvPacket) {
-        Log.d(TAG, "BEGIN RouteNeeded" + aodvPacket.toString());
+        Log.d(TAG, "BEGIN RouteNeeded Packet: " + aodvPacket.toString());
 
         // Check if there is an entry in our routing table
         Route r = getRouteFromRoutingTable(aodvPacket.getDestination());
 
         // In case we already have a route we can just forward it to the next node
         if (r != null){
+            Log.i(TAG, "routeNeeded: Route found for " + aodvPacket.getDestination());
             // Create AODV Packet for handler
             Message msg = mHandler.obtainMessage(AODVConstants.AODV_PACKET);
             Bundle bundle = new Bundle();
@@ -116,6 +144,7 @@ public class  AODVNetworkProtocol {
 
         // If there is no route, aodv actually needs to perform
         else {
+            Log.i(TAG, "routeNeeded: No route found for " + aodvPacket.getDestination());
             RREQCreater rreqCreater = new RREQCreater(aodvPacket.getDestination());
             rreqCreater.startThread();
         }
@@ -128,7 +157,7 @@ public class  AODVNetworkProtocol {
      * Add or update a route in the routing table
      * @param newRoute Route that needs to be added
      */
-    private void addRoute(Route newRoute){
+    private synchronized void addRoute(Route newRoute){
         Log.d(TAG, "BEGIN addRoute: " + newRoute.toString());
 
         // Iterating through the routing table
@@ -206,7 +235,7 @@ public class  AODVNetworkProtocol {
      * Sets all routes which involve destination param to inactive
      * @param unreachableDestination unreachable destination
      */
-    private void setRoutesInactive(String unreachableDestination){
+    private synchronized void setRoutesInactive(String unreachableDestination){
         Log.d(TAG, "BEGIN setRoutesInactive");
 
         // Iterating through the routing table
@@ -295,9 +324,9 @@ public class  AODVNetworkProtocol {
             int id = rreq_id.incrementAndGet();
             int seq_nr = sequence_number.incrementAndGet();
             this.aodvrreq = new AODVRREQ(0, 0, 0, 0,
-                    0, 0, RREQLIFETIME, 1, id, this.destination, 0,
+                    0, 0, RREQ_LIFETIME, 1, id, destination, 0,
                     ownNodeName, seq_nr);
-            Log.i(TAG, "new RREQ created: " + aodvrreq.toString());
+            Log.i(TAG, "RREQ created: " + aodvrreq.toString());
         }
 
         @RequiresApi(api = Build.VERSION_CODES.O)
@@ -351,12 +380,12 @@ public class  AODVNetworkProtocol {
             int seq = sequence_number.get();
 
             // Add a route from the node we received the RREQ
-            Route route1 = new Route(receivedFrom, receivedFrom, seq, 1, ROUTELIFETIME);
+            Route route1 = new Route(receivedFrom, receivedFrom, seq, 1, ROUTE_LIFETIME);
             addRoute(route1);
 
             // Add a route to the originator of the RREQ with receivedFrom as our nextHop
             Route route2 = new Route(aodvrreq.getOriginator(), receivedFrom,
-                    aodvrreq.getOrigSequenceNumber(), aodvrreq.getHopCount(), ROUTELIFETIME);
+                    aodvrreq.getOrigSequenceNumber(), aodvrreq.getHopCount(), ROUTE_LIFETIME);
             addRoute(route2);
 
             // Add to RREQ to our Request table
@@ -373,7 +402,7 @@ public class  AODVNetworkProtocol {
                 // Create an RREP for the handler
                 AODVRREP aodvrrep = new AODVRREP(0, 0, 0, 0,
                         route.getHop_count(), route.getDestination(), route.getSequence(),
-                        aodvrreq.getOriginator(), ROUTELIFETIME);
+                        aodvrreq.getOriginator(), ROUTE_LIFETIME);
                 Message msg = mHandler.obtainMessage(AODVConstants.AODV_RREP);
                 Bundle bundle = new Bundle();
                 bundle.putString(AODVConstants.NEXT_ADDR, receivedFrom);
@@ -434,9 +463,9 @@ public class  AODVNetworkProtocol {
 
             // Remark: destination is the one who sent the RREP, originator is the one
             // who sent the RREQ in the first place
-            Route route1 = new Route(receivedFrom, receivedFrom, seq, 1, ROUTELIFETIME);
+            Route route1 = new Route(receivedFrom, receivedFrom, seq, 1, ROUTE_LIFETIME);
             aodvrrep.setHopCount(aodvrrep.getHopCount()+1);
-            Route route2 = new Route(aodvrrep.getDestination(), receivedFrom, seq, aodvrrep.getHopCount(), ROUTELIFETIME);
+            Route route2 = new Route(aodvrrep.getDestination(), receivedFrom, seq, aodvrrep.getHopCount(), ROUTE_LIFETIME);
             addRoute(route1);
             addRoute(route2);
 
@@ -492,13 +521,50 @@ public class  AODVNetworkProtocol {
             this.aodvrerr = aodvrerr;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         void startThread(){
             Log.d(TAG, "BEGIN RERRReceiver startThread");
             start();
+
+            Message msg = mHandler.obtainMessage(AODVConstants.AODV_INFO);
+            Bundle bundle = new Bundle();
+            bundle.putString(AODVConstants.MESSAGE_BODY, "INFO " +  aodvrerr.toString() + " RECEIVED.");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
 
             setRoutesInactive(aodvrerr.getUnreachableDestination());
 
             Log.d(TAG, "END RERRReceiver startThread");
         }
     }
+
+// ----------------------------------- HELLO -----------------------------------
+
+    /**
+     * Class for receiving Hellos
+     */
+    private class HelloReceiver extends Thread {
+        private AODVHello aodvHello;
+        private String receivedFrom;
+
+        HelloReceiver(AODVHello aodvHello, String receivedFrom){
+            this.aodvHello = aodvHello;
+            this.receivedFrom = receivedFrom;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        void startThread(){
+            Log.d(TAG, "BEGIN HelloReceiver startThread");
+            start();
+            Message msg = mHandler.obtainMessage(AODVConstants.AODV_INFO);
+            Bundle bundle = new Bundle();
+            bundle.putString(AODVConstants.MESSAGE_BODY, "INFO " +  aodvHello.toString() + " RECEIVED.");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
+            Route route = new Route(receivedFrom, receivedFrom, sequence_number.get() , 1, ROUTE_LIFETIME);
+            addRoute(route);
+            Log.d(TAG, "END HelloReceiver startThread");
+        }
+    }
+
 }

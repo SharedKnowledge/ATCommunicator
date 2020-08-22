@@ -1,3 +1,11 @@
+/**
+ * Bluetooth Service is based on
+ * https://developer.android.com/guide/topics/connectivity/bluetooth and
+ * https://github.com/android/connectivity-samples/tree/master/BluetoothChat
+ * It was adapted for the purpose of this bachelor's thesis.
+ */
+
+
 package htw_berlin.ba_timsitte.communication;
 
 import android.bluetooth.BluetoothAdapter;
@@ -22,7 +30,7 @@ import java.util.UUID;
  * thread for performing data transmissions when connected.
  */
 public class BluetoothService {
-    // Debugging
+
     private static final String TAG = "BluetoothService";
 
     // Name for the SDP record when creating server socket

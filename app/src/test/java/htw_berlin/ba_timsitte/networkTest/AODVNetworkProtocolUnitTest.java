@@ -12,4 +12,10 @@ public class AODVNetworkProtocolUnitTest {
 
     }
 
+    @Test
+    public void testAODV(){
+        String test = "AODV|Hi";
+        String sub_test = test.substring(5);
+        assertEquals(sub_test, "Hi");
+    }
 }

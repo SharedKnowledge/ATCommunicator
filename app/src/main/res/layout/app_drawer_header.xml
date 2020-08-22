@@ -2,20 +2,37 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="200dp"
     android:background="@color/colorPrimaryDark"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:layout_gravity="bottom">
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:layout_height="20dp"
         android:textColor="@color/colorText"
+        />
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_applauncher"
+        android:paddingLeft="17dp"
         />
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/menu"
-        android:textSize="30sp"
+        android:textSize="17sp"
         android:textColor="@color/colorText"
         android:paddingStart="17dp"
+        android:paddingTop="17dp"
         />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/menu2"
+        android:textSize="15sp"
+        android:textColor="@color/colorLightGreyText"
+        android:paddingStart="17dp"
+        />
+
 </LinearLayout>

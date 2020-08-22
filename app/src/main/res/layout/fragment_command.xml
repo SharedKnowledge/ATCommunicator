@@ -82,17 +82,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text=""
-            android:hint="Send to"
             android:textColor="@color/colorText"
-            android:layout_weight="2"/>
+            android:hint="Send to"
+            android:textColorHint="@color/colorHintText"
+            android:layout_weight="2"
+            android:enabled="false"/>
 
         <EditText
             android:id="@+id/sendCommand"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text=""
-            android:hint="Message"
             android:textColor="@color/colorText"
+            android:hint="Message"
+            android:textColorHint="@color/colorHintText"
             android:layout_weight="5"/>
 
         <Button

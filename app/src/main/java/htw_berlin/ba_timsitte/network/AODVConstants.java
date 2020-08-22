@@ -8,7 +8,8 @@ public interface AODVConstants {
     public static final int AODV_RERR = 3;
     public static final int AODV_RERR_ACK = 4;
     public static final int AODV_PACKET = 5;
-    public static final int AODV_INFO = 6; // Information output for protocol events
+    public static final int AODV_HELLO = 6;
+    public static final int AODV_INFO = 7; // Information output for protocol events
 
     // Key names
     public static final String MESSAGE_BODY = "MESSAGE_BODY"; // the body which needs to be send with AT
