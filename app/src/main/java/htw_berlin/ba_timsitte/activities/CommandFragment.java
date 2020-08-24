@@ -276,6 +276,7 @@ public class CommandFragment extends Fragment {
         if (isAODVActive){
             // Check that there's actually something to send
             if (message.length() > 0 && sendTo.length() > 0 && sendTo.length() <= 4){
+                // Message has to be send to the protocol first to check if there is an route entry
                 AODVPacket aodvPacket = new AODVPacket(mAODVNetworkProtocol.getOwnNodeName(), sendTo, message);
                 Log.d(TAG, "sendMessage: aodvPacket " + aodvPacket.toString());
                 mAODVNetworkProtocol.handleIncomingMessage(aodvPacket.getOriginator(),
@@ -304,7 +305,7 @@ public class CommandFragment extends Fragment {
 }
 
     /**
-     *
+     *  Class for sending an AODV message with the help of at commands
      */
     private class SendAODVMessage extends Thread {
         private String addr;
@@ -334,25 +335,34 @@ public class CommandFragment extends Fragment {
 
         public void startThread() {
             Log.d(TAG, "BEGIN SendAODVMessage startThread");
-            // AT+ADDR=\r\n
-            // mBluetoothService.write();
-            //msg.toString();
+
+            start();
+
+            // Set Address
+            String setAddr = "AT+ADDR=" + addr + "\r\n";
+            byte[] sendSetAddr = setAddr.getBytes();
+            mBluetoothService.write(sendSetAddr);
+
+            // Waiting for response must be implemented and a timeout
+            // OK or ERR
+
+            String setLength = "AT+SEND=" + msg.toString().length() + "\r\n";
+            byte[] sendSetLength = setLength.getBytes();
+            mBluetoothService.write(sendSetLength);
+
+            // Waiting for response must be implemented and a timeout
+            // OK or ERR
+
+            String actualMessage = msg.toString();
+            byte[] sendactualMessage = actualMessage.getBytes();
+            mBluetoothService.write(sendactualMessage);
+
+            // Waiting for AT, SENDING
+
+            // Waiting for AT, SENDED
+
             Log.d(TAG, "END SendAODVMessage startThread");
             }
-
-
-            // waiting for response AT, OK, repeat until err >= timeout1
-
-            // AT+SEND=XX\r\n
-
-            // waiting for response AT, OK; repeat until err >= timeout1
-
-            // AODVMessage.toString
-
-            // waiting for AT, SENDING
-
-            // waiting for AT, SENDED
-
     }
 
     /**
@@ -444,33 +454,43 @@ public class CommandFragment extends Fragment {
                 case AODVConstants.AODV_RREQ:
                     Log.i(TAG, "handleMessage: AODV RREQ");
                     AODVRREQ aodvrreq = (AODVRREQ) msg.obj;
-                    SendAODVMessage aodvMessageThread = new SendAODVMessage(aodvrreq, "FFFF");
-                    aodvMessageThread.startThread();
+                    SendAODVMessage aodvMessageThread1 = new SendAODVMessage(aodvrreq, "FFFF");
+                    aodvMessageThread1.startThread();
                     mAODVArrayAdapter.add(getCurrentTime() + aodvrreq.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_RREP:
                     Log.i(TAG, "handleMessage: AODV RREP");
                     AODVRREP aodvrrep = (AODVRREP) msg.obj;
+                    SendAODVMessage aodvMessageThread2 = new SendAODVMessage(aodvrrep, "FFFF");
+                    aodvMessageThread2.startThread();
                     mAODVArrayAdapter.add(getCurrentTime() + aodvrrep.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_RERR:
                     Log.i(TAG, "handleMessage: AODV RERR");
                     AODVRERR aodvrerr = (AODVRERR) msg.obj;
+                    SendAODVMessage aodvMessageThread3 = new SendAODVMessage(aodvrerr, "FFFF");
+                    aodvMessageThread3.startThread();
                     mAODVArrayAdapter.add(getCurrentTime() +  aodvrerr.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_RERR_ACK:
                     Log.i(TAG, "handleMessage: AODV RERR_ACK");
                     AODVRREP_ACK aodvrrep_ack = (AODVRREP_ACK) msg.obj;
+                    SendAODVMessage aodvMessageThread4 = new SendAODVMessage(aodvrrep_ack, "FFFF");
+                    aodvMessageThread4.startThread();
                     mAODVArrayAdapter.add(getCurrentTime() +  aodvrrep_ack.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_PACKET:
                     Log.i(TAG, "handleMessage: AODV PACKET");
                     AODVPacket aodvPacket = (AODVPacket) msg.obj;
+                    SendAODVMessage aodvMessageThread5 = new SendAODVMessage(aodvPacket, "FFFF");
+                    aodvMessageThread5.startThread();
                     mAODVArrayAdapter.add(getCurrentTime() + aodvPacket.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_HELLO:
                     Log.i(TAG, "handleMessage: AODV HELLO");
                     AODVHello aodvHello = (AODVHello) msg.obj;
+                    SendAODVMessage aodvMessageThread6 = new SendAODVMessage(aodvHello, "FFFF");
+                    aodvMessageThread6.startThread();
                     mAODVArrayAdapter.add(getCurrentTime() + aodvHello.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_INFO:
