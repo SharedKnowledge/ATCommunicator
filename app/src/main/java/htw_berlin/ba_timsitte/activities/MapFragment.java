@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.core.app.ActivityCompat;
@@ -58,7 +59,7 @@ public class MapFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
-        initiateMapView();
+        initiateMapView(ctx);
 
 //        Intent intent = getActivity().getIntent();
 //        nodeList = intent.getParcelableArrayListExtra("nodeList");
@@ -76,7 +77,7 @@ public class MapFragment extends Fragment {
 
 
     // ----------------- Map methods -----------------
-    public void initiateMapView(){
+    public void initiateMapView(Context ctx){
         map.setTileSource(TileSourceFactory.MAPNIK);
 
         // zoom buttons
@@ -86,7 +87,8 @@ public class MapFragment extends Fragment {
         // default view point - should be change to live gps location
         IMapController mapController = map.getController();
         mapController.setZoom(17.5);
-        GeoPoint startPoint = new GeoPoint(52.566875, 13.410447);
+
+        GeoPoint startPoint = new GeoPoint(52.457242, 13.526940);
         mapController.setCenter(startPoint);
 
         // WRITE_EXTERNAL_STORAGE is required in order to show the map

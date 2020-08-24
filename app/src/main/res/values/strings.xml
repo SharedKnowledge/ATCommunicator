@@ -40,6 +40,8 @@
     <string name="menu">AT Communicator</string>
     <string name="menu2">with AODV-Implementation</string>
 
+    <!-- Settings Menu -->
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

@@ -247,10 +247,13 @@ public class CommandFragment extends Fragment {
                 public void onClick(DialogInterface dialog, int which) {
                     nodeName = input.getText().toString();
                     Log.i(TAG, "toggleAODV onClick: new name " +  nodeName);
-                    if (nodeName.length() > 0){
+                    if (nodeName.length() > 0 && nodeName.length() <= 4){
                         Intent intent = new Intent(AODV_STATUS);
                         intent.putExtra(AODV_STATUS_EXTRA, AODV_ON);
                         _context.sendBroadcast(intent);
+                    } else {
+                        Toast.makeText(_context, "Name must be between 1 and 4 characters long.",
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -273,13 +276,13 @@ public class CommandFragment extends Fragment {
         String sendTo = mSendToEditText.getText().toString();
         if (isAODVActive){
             // Check that there's actually something to send
-            if (message.length() > 0 && sendTo.length() > 0){
+            if (message.length() > 0 && sendTo.length() > 0 && sendTo.length() <= 4){
                 AODVPacket aodvPacket = new AODVPacket(mAODVNetworkProtocol.getOwnNodeName(), sendTo, message);
                 Log.d(TAG, "sendMessage: aodvPacket " + aodvPacket.toString());
                 mAODVNetworkProtocol.handleIncomingMessage(aodvPacket.getOriginator(),
                         String.join("|", "5", mAODVNetworkProtocol.getOwnNodeName(), sendTo, message));
             } else {
-                Toast.makeText(_context, "At least one text field is empty.",
+                Toast.makeText(_context, "At least one text field is empty or sendTo is longer than 4 characters",
                         Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -447,7 +450,7 @@ public class CommandFragment extends Fragment {
                     mAODVArrayAdapter.add(getCurrentTime() +  aodvrrep_ack.toInfoString() + " CREATED");
                     break;
                 case AODVConstants.AODV_PACKET:
-                    Log.i(TAG, "handleMessage: IP PACKET");
+                    Log.i(TAG, "handleMessage: AODV PACKET");
                     AODVPacket aodvPacket = (AODVPacket) msg.obj;
                     mAODVArrayAdapter.add(getCurrentTime() + aodvPacket.toInfoString() + " CREATED");
                     break;

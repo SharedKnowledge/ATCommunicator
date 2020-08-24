@@ -49,6 +49,9 @@ public class RouteListAdapter extends ArrayAdapter<Route> {
         TextView sequence = (TextView) listItem.findViewById(R.id.av_sequence);
         sequence.setText(currentRoute.getSequence());
 
+        TextView isActive = (TextView) listItem.findViewById(R.id.av_isactive);
+        sequence.setText(String.valueOf(currentRoute.isIs_active()));
+
         return listItem;
     }
 }

@@ -13,7 +13,7 @@
     <!---RF Frequency-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -45,7 +45,7 @@
     <!---Power-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -78,7 +78,7 @@
     <!---Signal Bandwidth-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -105,7 +105,7 @@
     <!---Spreading Factor-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -132,7 +132,7 @@
     <!---Error Coding-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -159,7 +159,7 @@
     <!---CRC-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -184,7 +184,7 @@
     <!---Implicit Header On-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -209,7 +209,7 @@
     <!---Rx Single on-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -234,7 +234,7 @@
     <!---Frequency Hop on-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -259,7 +259,7 @@
     <!---Hop Period-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -292,7 +292,7 @@
     <!---Payload Length-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -325,7 +325,7 @@
     <!---Preamble Length-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
@@ -354,4 +354,12 @@
             android:gravity="center_vertical"
             android:text="" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/copy_button"
+        android:text="COPY"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>
