@@ -397,11 +397,15 @@ public class  AODVNetworkProtocol {
             Log.d(TAG, "END RREQCreater startThread");
         }
         private Runnable mRREPRunnable = new Runnable() {
+            private int max = 10;
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
-                Log.d(TAG, "rrepHandler: Trying to find RREP for " + aodvrreq.toString());
-
+                Log.d(TAG, "rrepHandler: Trying to find RREP for " + aodvrreq.toString() + " tries left until timeout: " + max);
+                if (0>=max){
+                    rrepHandler.removeCallbacks(this);
+                    return;
+                }
                 AODVRREP rrep = getRREPFromTable(aodvrreq);
                 if (rrep != null){
                     // In case there is an RREP we create a new route and sending it to the routing table
@@ -417,7 +421,9 @@ public class  AODVNetworkProtocol {
                     removeRREP(rrep);
                     return; // End Runnable
                 }
+                max = max-1;
                 rrepHandler.postDelayed(this, 3000);
+
             }
         };
     }
