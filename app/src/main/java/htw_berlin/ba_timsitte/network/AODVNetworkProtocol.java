@@ -18,6 +18,7 @@ public class  AODVNetworkProtocol {
 
     private ArrayList<Route> routingTable = new ArrayList<Route>();
     private ArrayList<RREQEntry> requestTable = new ArrayList<RREQEntry>();
+
     private ArrayList<AODVRREP> rrepTable = new ArrayList<>(); // list for RREP which are meant for us
     private AtomicInteger rreq_id = new AtomicInteger(0);
     private AtomicInteger sequence_number = new AtomicInteger(0);
@@ -633,4 +634,11 @@ public class  AODVNetworkProtocol {
         }
     }
 
+    public ArrayList<Route> getRoutingTable() {
+        return routingTable;
+    }
+
+    public ArrayList<RREQEntry> getRequestTable() {
+        return requestTable;
+    }
 }

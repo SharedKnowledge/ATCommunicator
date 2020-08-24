@@ -1,9 +1,12 @@
 package htw_berlin.ba_timsitte.network;
 
 import android.os.CountDownTimer;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
-public class Route {
+public class Route implements Parcelable {
 
     private String destination;
     private int destSequenceNumber;
@@ -34,6 +37,42 @@ public class Route {
         this.is_active = true;
         this.timeToLive.start();
     }
+
+    protected Route(Parcel in) {
+        destination = in.readString();
+        destSequenceNumber = in.readInt();
+        next = in.readString();
+        hop_count = in.readInt();
+        is_active = in.readByte() != 0;
+        lifetime = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(destination);
+        dest.writeInt(destSequenceNumber);
+        dest.writeString(next);
+        dest.writeInt(hop_count);
+        dest.writeByte((byte) (is_active ? 1 : 0));
+        dest.writeInt(lifetime);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Route> CREATOR = new Creator<Route>() {
+        @Override
+        public Route createFromParcel(Parcel in) {
+            return new Route(in);
+        }
+
+        @Override
+        public Route[] newArray(int size) {
+            return new Route[size];
+        }
+    };
 
     @NonNull
     @Override

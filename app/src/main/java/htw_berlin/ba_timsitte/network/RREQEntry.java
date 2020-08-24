@@ -1,6 +1,9 @@
 package htw_berlin.ba_timsitte.network;
 
-public class RREQEntry {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class RREQEntry implements Parcelable {
     private int id;
     private String originator;
 
@@ -9,6 +12,23 @@ public class RREQEntry {
         this.originator = originator;
 
     }
+
+    protected RREQEntry(Parcel in) {
+        id = in.readInt();
+        originator = in.readString();
+    }
+
+    public static final Creator<RREQEntry> CREATOR = new Creator<RREQEntry>() {
+        @Override
+        public RREQEntry createFromParcel(Parcel in) {
+            return new RREQEntry(in);
+        }
+
+        @Override
+        public RREQEntry[] newArray(int size) {
+            return new RREQEntry[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -24,5 +44,16 @@ public class RREQEntry {
 
     public void setOriginator(String originator) {
         this.originator = originator;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(originator);
     }
 }

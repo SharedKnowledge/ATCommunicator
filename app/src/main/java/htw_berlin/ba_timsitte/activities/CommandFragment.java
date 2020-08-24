@@ -33,7 +33,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -105,7 +104,7 @@ public class CommandFragment extends Fragment {
     private static final int AODV_ON = 1;
     private static final int AODV_OFF = 0;
 
-    Calendar time = Calendar.getInstance();
+    String receivedFrom = ""; // address which was the last messages received
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -392,10 +391,17 @@ public class CommandFragment extends Fragment {
                     byte[] readBuf = (byte[]) msg.obj;
                     // Construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    if (readMessage.startsWith("AODV|")){
-                        String aodvMessage = readMessage.substring(6);
-                        mAODVNetworkProtocol.handleIncomingMessage("unknown", aodvMessage);
+
+                    // "LR, XXXX, XX, Text" is the format when receiving bytes from other LoRa moduls
+                    if (readMessage.startsWith("LR,")){
+                        String rMsg[] = readMessage.split(",");
+                        Log.i(TAG, "handleMessage: received message from another node with name " + rMsg[1]);
+                        if (rMsg[3].startsWith("AODV|")){
+                            String aodvMessage = readMessage.substring(6);
+                            mAODVNetworkProtocol.handleIncomingMessage(rMsg[1], aodvMessage);
+                        }
                     }
+
                     mCommunicationArrayAdapter.add(getCurrentTime() + readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
@@ -425,6 +431,14 @@ public class CommandFragment extends Fragment {
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void handleMessage(Message msg) {
+//            try {
+//                ((MainActivity) getActivity()).setRoutingTable(mAODVNetworkProtocol.getRoutingTable());
+//                ((MainActivity) getActivity()).setRreqTable(mAODVNetworkProtocol.getRequestTable());
+//                Log.i(TAG, "handleMessage: routingtable size" + mAODVNetworkProtocol.getRoutingTable().size());
+//                Log.i(TAG, "handleMessage: rreqtable size" + mAODVNetworkProtocol.getRequestTable().size());
+//            } catch (NullPointerException e){
+//                Log.e(TAG, "handleMessage: empty routing table", e);
+//            }
             FragmentActivity activity = getActivity();
             switch (msg.what) {
                 case AODVConstants.AODV_RREQ:
@@ -528,7 +542,7 @@ public class CommandFragment extends Fragment {
     }
 
     private String getCurrentTime(){
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss.SSS");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
         String out = simpleDateFormat.format(new Date());
         return out + " ";
     }

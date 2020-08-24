@@ -58,13 +58,17 @@
         android:id="@+id/communicationView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true"/>
 
     <ListView
         android:id="@+id/aodvView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true"/>
 
 
     <View

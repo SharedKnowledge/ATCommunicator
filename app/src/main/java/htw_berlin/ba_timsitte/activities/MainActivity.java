@@ -17,9 +17,13 @@ import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import htw_berlin.ba_timsitte.R;
+import htw_berlin.ba_timsitte.network.RREQEntry;
+import htw_berlin.ba_timsitte.network.Route;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -33,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MapFragment mMapFragment;
     private SettingsFragment mSettingsFragment;
     private AODVFragment mAODVFragment;
+
+    public ArrayList<Route> routingTable = new ArrayList<>();
+    public ArrayList<RREQEntry> rreqTable = new ArrayList<>();
 
 
     @Override
@@ -203,5 +210,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .commit();
         }
         Log.d(TAG, "loadFragment: " + fragment.toString());
+    }
+
+    public void setRoutingTable(ArrayList<Route> routingTable) {
+        this.routingTable = routingTable;
+    }
+
+    public ArrayList<Route> getRoutingTable() {
+        return routingTable;
+    }
+
+    public ArrayList<RREQEntry> getRreqTable() {
+        return rreqTable;
+    }
+
+    public void setRreqTable(ArrayList<RREQEntry> rreqTable) {
+        this.rreqTable = rreqTable;
     }
 }
